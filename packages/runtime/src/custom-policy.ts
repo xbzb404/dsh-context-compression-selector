@@ -64,6 +64,28 @@ const customCompressionPolicyV3InputSchema = z.object({
   tailTrim: tailTrimSchema,
 }).required()
 
+/**
+ * JSON-survivable union of every Custom document a Host form may carry.
+ *
+ * A Host Config field that a browser edits must survive the round trip the
+ * settings surface performs: the Host serves the field's form schema as
+ * `schema.toJSON()` and the client rehydrates it to validate the value it was
+ * served. {@link CustomCompressionPolicySchema} cannot survive that trip — a
+ * schemastery `transform` serializes its `transform` type and inner schema but
+ * never its callback, so the rehydrated node throws `callback is not a function`
+ * on the very document it is meant to accept, the client's form never leaves
+ * `loading`, and every control rendering from it stays disabled.
+ *
+ * This union validates the same three input shapes with no callback, so it is
+ * the schema a live-editable field may expose. The transform stays the gate for
+ * values the runtime resolves itself.
+ */
+export const CustomCompressionPolicyInputSchema: z<CustomCompressionPolicy> = z.union([
+  customCompressionPolicyV1InputSchema,
+  customCompressionPolicyV2InputSchema,
+  customCompressionPolicyV3InputSchema,
+]) as z<CustomCompressionPolicy>
+
 /** Canonical Custom document accepted by Host settings and the runtime resolver. */
 export const CustomCompressionPolicySchema: z<CustomCompressionPolicy> = z.transform(
   z.any().required(),

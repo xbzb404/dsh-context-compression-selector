@@ -1,0 +1,14 @@
+# Standalone Profile Bundle entry. The same package may already be present in a
+# Harness distribution; its Host implementation reference-counts the preset
+# decoration so the two rows never install two compression stacks.
+#
+# The row id IS the settings namespace: Harness 0.2.0 serves one settings form
+# per profile-row entry id, and the browser selector reads that same entry id
+# through `configForms.get(entryId)`. Renaming it without renaming
+# `CONTEXT_COMPRESSION_SETTINGS_NAMESPACE` (and the client's entry id) orphans
+# the form.
+- insert:
+    - id: context-compression
+      name: 'dsh-context-compression-selector'
+      config:
+        presetOverlay: true

@@ -21,3 +21,6 @@ packages/*/lib/**/*.tsbuildinfo
 # AgentTeams runtime state (rosters, task ledgers, mailboxes) is local
 # coordination state, not project source.
 .agent-teams/
+
+# Local install/asar/closure probe output (generated logs and dumps).
+out/

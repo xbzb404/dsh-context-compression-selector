@@ -72,6 +72,7 @@ import {
   priceOfficialDeepSeekUsage,
   resolveOfficialDeepSeekPrice,
 } from './deepseek-official-pricing.ts'
+import { isDeepSeekBilledProvider } from './deepseek-route.ts'
 import { emitCompressionAudit } from './audit.ts'
 import { assertNever, deepFreeze } from './value.ts'
 import type {
@@ -93,6 +94,7 @@ export {
   resolvePolicy,
 } from './config.ts'
 export {
+  CustomCompressionPolicyInputSchema,
   CustomCompressionPolicySchema,
   DEFAULT_CUSTOM_COMPRESSION_POLICY,
   resolveCustomPolicy,
@@ -630,7 +632,7 @@ export class ToolResultPruner extends Service {
   private tokenizerAuditFact(route: { provider: string, model: string }): { tokenizer: { repository: string, revision: string } } {
     // Reuse the measurement eligibility boundary: a DeepSeek model id routed
     // through another provider never used the bundled tokenizer.
-    const eligible = route.provider === 'deepseek' || route.provider === 'deepseek-official'
+    const eligible = isDeepSeekBilledProvider(route.provider)
     const identity = eligible ? deepSeekV4TokenizerForModel(route.model)?.countText('') : undefined
     if (identity?.kind === 'exact-tokenizer') {
       return { tokenizer: { repository: identity.tokenizerId, revision: identity.tokenizerRevision } }

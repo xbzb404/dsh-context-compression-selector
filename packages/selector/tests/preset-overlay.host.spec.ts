@@ -118,6 +118,21 @@ describe('plugin-owned preset overlay variants', () => {
     expect([...registry.registered.keys()]).toEqual([`standard${DEFAULT_VARIANT_ID_SUFFIX}`])
   })
 
+  it('keeps the other variants when sources cannot be composed', async () => {
+    const registry = new FakePresetRegistry([
+      { id: 'standard', rows: STANDARD_ROWS },
+      { id: 'minimal', rows: MINIMAL_ROWS },
+      // Documents that are not top-level entry lists. Composing one used to
+      // abort the whole pass, so a single unusable source cost the profile every
+      // compression variant and the rejection was swallowed by the caller.
+      { id: 'damaged-a', rows: { not: 'an entry list' } as never },
+      { id: 'damaged-b', rows: 'neither is this' as never },
+    ])
+    const installation = await install(registry)
+    await expect(installation.ready()).rejects.toThrow(/preset variant publication failed/u)
+    expect([...registry.registered.keys()]).toEqual([`standard${DEFAULT_VARIANT_ID_SUFFIX}`])
+  })
+
   it('never derives a variant from one of its own variants', async () => {
     const registry = new FakePresetRegistry(SOURCES)
     const installation = await install(registry)
@@ -177,6 +192,16 @@ describe('plugin-owned preset overlay variants', () => {
     expect(variant?.name).toBe('Standard · Context compression')
     expect(variant?.description).toBe('native')
     expect(variant?.order).toBe(3)
+  })
+
+  it('describes each variant through the caller-supplied formatter', async () => {
+    const registry = new FakePresetRegistry([
+      { id: 'standard', description: 'native', rows: STANDARD_ROWS },
+    ])
+    const installation = await install(registry, { describeVariant: source => `over ${source.id}` })
+    await installation.ready()
+
+    expect(registry.registered.get(`standard${DEFAULT_VARIANT_ID_SUFFIX}`)?.description).toBe('over standard')
   })
 
   it('withdraws every variant on disposal and restores an empty roster', async () => {

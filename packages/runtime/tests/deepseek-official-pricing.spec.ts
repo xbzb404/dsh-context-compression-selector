@@ -201,6 +201,44 @@ describe('DeepSeek checked-in official price catalog', () => {
     expect(resolved.reason).toContain(reason)
   })
 
+  it.each([
+    ['official-public'],
+    ['account-official'],
+  ] as const)('prices the signed-in account route on the shared published tuple (%s)', (baseUrlClass) => {
+    expect(resolveOfficialDeepSeekPrice({
+      provider: 'deepseek-account',
+      baseUrlClass,
+      apiRoute: 'chat-completions',
+      modelId: 'deepseek-flash',
+      currency: 'CNY',
+      at: new Date('2026-08-23T01:00:00.000Z'),
+    })).toMatchObject({
+      kind: 'priced',
+      record: {
+        provider: 'deepseek-account',
+        baseUrlClass,
+        modelVersion: 'DeepSeek-V4.1-Flash',
+        inputCacheHit: '0.02',
+        inputCacheMiss: '1',
+        output: '4',
+      },
+    })
+  })
+
+  it('still refuses the account provider behind a non-official base-url class', () => {
+    const resolved = resolveOfficialDeepSeekPrice({
+      provider: 'deepseek-account',
+      baseUrlClass: 'compatible-hmac:v1:test',
+      apiRoute: 'chat-completions',
+      modelId: 'deepseek-flash',
+      currency: 'USD',
+      at: new Date('2026-08-23T01:00:00.000Z'),
+    })
+    expect(resolved.kind).toBe('unpriced')
+    if (resolved.kind !== 'unpriced') throw new Error('expected an unpriced result')
+    expect(resolved.reason).toContain('base-url')
+  })
+
   it('computes provider-usage cost with fixed-point arithmetic, never JS float money', () => {
     const cost = priceOfficialDeepSeekUsage({
       provider: 'deepseek-official',

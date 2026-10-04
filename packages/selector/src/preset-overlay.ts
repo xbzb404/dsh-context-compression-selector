@@ -78,6 +78,14 @@ export interface PresetOverlayOptions {
   readonly idSuffix?: string
   /** Appended to the source preset's display name. */
   readonly displaySuffix?: string
+  /**
+   * Description shown for one variant in the Host's preset picker.
+   *
+   * The Host's own preset declarations carry no description, so a variant would
+   * otherwise render as "No description." next to a name that only repeats the
+   * source id. Returning `undefined` keeps whatever the source preset declares.
+   */
+  readonly describeVariant?: (source: AgentPreset) => string | undefined
 }
 
 /** Handle returned by {@link installCompressionVariants}. */
@@ -263,25 +271,49 @@ class VariantPublisher {
    * A variant whose id is already declared is left to its owner: that is the
    * ordinary reinstall shape (this installation's second lease) and the shape
    * left behind by a process that died before its withdraw.
+   *
+   * One source preset that cannot be composed does not withdraw the others: its
+   * failure is collected and every remaining source is still published, because a
+   * single unusable document must not cost the profile its whole compression
+   * stack. All failures are reported together as one rejection for the caller to
+   * log.
    */
   private async publishOnce(): Promise<void> {
     const suffix = this.options.idSuffix ?? DEFAULT_VARIANT_ID_SUFFIX
     const native = await this.registry.list()
     const declared = new Set(native.map(preset => preset.id))
+    const failures: { id: string, error: unknown }[] = []
     for (const preset of native) {
       if (this.disposed) return
       if (!isPublishable(preset, suffix, this.excluded())) continue
       const id = `${preset.id}${suffix}`
       if (this.variants.has(id) || declared.has(id)) continue
-      const rows = await this.composeRows(preset.id)
-      const release = await this.registry.register({
-        id,
-        name: `${preset.name ?? preset.id} · ${this.options.displaySuffix ?? DEFAULT_DISPLAY_SUFFIX}`,
-        ...(preset.description === undefined ? {} : { description: preset.description }),
-        ...(preset.order === undefined ? {} : { order: preset.order }),
-        plugins: rows,
-      })
-      this.variants.set(id, { release })
+      try {
+        const rows = await this.composeRows(preset.id)
+        const description = this.options.describeVariant?.(preset) ?? preset.description
+        const release = await this.registry.register({
+          id,
+          name: `${preset.name ?? preset.id} · ${this.options.displaySuffix ?? DEFAULT_DISPLAY_SUFFIX}`,
+          ...(description === undefined ? {} : { description }),
+          ...(preset.order === undefined ? {} : { order: preset.order }),
+          plugins: rows,
+        })
+        this.variants.set(id, { release })
+      } catch (error: unknown) {
+        failures.push({ id, error })
+      }
+    }
+    if (failures.length === 1) {
+      // One failure keeps its own message: it names the actual defect (an
+      // unusable document, a non-finite threshold) better than a wrapper can.
+      throw failures[0]!.error
+    }
+    if (failures.length > 1) {
+      throw new AggregateError(
+        failures.map(failure => new Error(
+          `context-compression selector: cannot publish preset variant ${failure.id}`, { cause: failure.error })),
+        'context-compression selector: preset variant publication failed',
+      )
     }
   }
 

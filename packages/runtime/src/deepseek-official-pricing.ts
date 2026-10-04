@@ -1,5 +1,12 @@
 /** Checked-in DeepSeek official prices and fixed-point provider-usage accounting. */
 
+import {
+  isDeepSeekBilledProvider,
+  isDeepSeekOfficialBaseUrlClass,
+  type DeepSeekBilledProviderId,
+  type DeepSeekOfficialBaseUrlClass,
+} from './deepseek-route.ts'
+
 export const DEEPSEEK_OFFICIAL_PRICE_CATALOG_VERSION = 'deepseek-official-2026-09-23' as const
 /**
  * Wall-clock time at which the checked-in official price pages were verified.
@@ -25,8 +32,8 @@ export type OfficialDeepSeekModelId =
 export interface OfficialDeepSeekPriceRecord {
   readonly catalogVersion: typeof DEEPSEEK_OFFICIAL_PRICE_CATALOG_VERSION
   readonly checkedAt: typeof DEEPSEEK_OFFICIAL_PRICE_CHECKED_AT
-  readonly provider: 'deepseek-official'
-  readonly baseUrlClass: 'official-public'
+  readonly provider: DeepSeekBilledProviderId
+  readonly baseUrlClass: DeepSeekOfficialBaseUrlClass
   readonly apiRoute: DeepSeekPriceApiRoute
   readonly modelId: OfficialDeepSeekModelId
   readonly modelVersion: string
@@ -100,12 +107,17 @@ const CNY_SOURCE = 'https://api-docs.deepseek.com/zh-cn/quick_start/pricing/'
 
 /**
  * Resolve one immutable official price record; aliases and compatible gateways fail closed.
+ *
+ * Every DeepSeek-billed provider route (`deepseek`, `deepseek-official`, and the
+ * signed-in `deepseek-account` route) is priced on the same published page, so
+ * the record reports the provider and base-url class it actually resolved
+ * instead of overwriting them with the API-key names.
  * @param input - exact provider, endpoint, route, model, currency, and timestamp applicability.
  * @returns An immutable price record or an explicit unpriced reason.
  */
 export function resolveOfficialDeepSeekPrice(input: ResolvePriceInput): OfficialDeepSeekPriceResolution {
-  if (input.provider !== 'deepseek-official') return unpriced('unknown provider route')
-  if (input.baseUrlClass !== 'official-public') return unpriced('unknown base-url applicability')
+  if (!isDeepSeekBilledProvider(input.provider)) return unpriced('unknown provider route')
+  if (!isDeepSeekOfficialBaseUrlClass(input.baseUrlClass)) return unpriced('unknown base-url applicability')
   if (input.apiRoute !== 'chat-completions' && input.apiRoute !== 'responses') {
     return unpriced('unknown API route')
   }
@@ -120,8 +132,8 @@ export function resolveOfficialDeepSeekPrice(input: ResolvePriceInput): Official
     record: Object.freeze({
       catalogVersion: DEEPSEEK_OFFICIAL_PRICE_CATALOG_VERSION,
       checkedAt: DEEPSEEK_OFFICIAL_PRICE_CHECKED_AT,
-      provider: 'deepseek-official',
-      baseUrlClass: 'official-public',
+      provider: input.provider,
+      baseUrlClass: input.baseUrlClass,
       apiRoute: input.apiRoute,
       modelId: input.modelId,
       modelVersion: model.version,

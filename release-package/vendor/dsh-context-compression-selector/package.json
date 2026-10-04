@@ -1,0 +1,100 @@
+{
+  "name": "dsh-context-compression-selector",
+  "version": "0.2.0-rc.1",
+  "description": "One-install context-compression selector bundle for DeepSeek Harness",
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./invariant": {
+      "types": "./lib/invariant.d.ts",
+      "default": "./lib/invariant.js"
+    },
+    "./client": {
+      "types": "./lib/client.d.ts",
+      "default": "./lib/client.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib/**/*.js",
+    "lib/**/*.d.ts",
+    "cordis.patch.yml",
+    "README.md",
+    "README.zh.md",
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+    "dsh": {
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-modules",
+        "@deepseek-ai/dsh-client-ui-settings",
+        "@deepseek-ai/dsh-client-ui-workspace"
+      ],
+      "platform": "web"
+    },
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "scripts": {
+    "bundle": "tsdown --config tsdown.config.ts && tsdown --config tsdown.client.config.ts",
+    "prepack": "pnpm run bundle",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run --root ../.. --config vitest.config.ts --project selector-host --project selector-client",
+    "pack:dry-run": "npm pack --dry-run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xbzb404/dsh-context-compression-selector.git",
+    "directory": "packages/selector"
+  },
+  "homepage": "https://github.com/xbzb404/dsh-context-compression-selector#readme",
+  "bugs": {
+    "url": "https://github.com/xbzb404/dsh-context-compression-selector/issues"
+  },
+  "author": "ZHB",
+  "engines": {
+    "node": "^22.19.0 || >=24.0.0"
+  },
+  "keywords": [
+    "deepseek",
+    "harness",
+    "context",
+    "compression",
+    "plugin"
+  ],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "tag": "latest"
+  },
+  "dependencies": {
+    "dsh-context-compression-selector-runtime": "0.2.0-rc.1",
+    "js-yaml": "^4.2.0"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": ">=4.0.4 <5",
+    "@deepseek-ai/cordis-plugin-include": ">=1.0.9 <2",
+    "@deepseek-ai/cordis-plugin-loader": ">=1.0.5 <2",
+    "@deepseek-ai/dsh-agent-preset-registry": ">=0.2.0-rc.2 <0.3.0",
+    "@deepseek-ai/dsh-command-compact": ">=0.2.0-rc.2 <0.3.0",
+    "@deepseek-ai/dsh-compaction-basic": ">=0.2.0-rc.2 <0.3.0",
+    "@deepseek-ai/dsh-client-locale": ">=0.2.0-rc.2 <0.3.0",
+    "@deepseek-ai/dsh-client-modules": ">=0.2.0-rc.2 <0.3.0",
+    "@deepseek-ai/dsh-client-ui-primitives": ">=0.2.0-rc.2 <0.3.0",
+    "@deepseek-ai/dsh-client-ui-settings": ">=0.2.0-rc.2 <0.3.0",
+    "@deepseek-ai/dsh-client-ui-slots": ">=0.2.0-rc.2 <0.3.0",
+    "@deepseek-ai/dsh-client-ui-workspace": ">=0.2.0-rc.2 <0.3.0",
+    "@deepseek-ai/dsh-invariants": ">=0.2.0-rc.2 <0.3.0",
+    "@deepseek-ai/dsh-settings": ">=0.2.0-rc.2 <0.3.0",
+    "@deepseek-ai/schemastery": ">=3.18.4 <4",
+    "react": ">=18 <19"
+  }
+}

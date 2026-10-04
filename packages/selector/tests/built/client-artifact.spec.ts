@@ -34,7 +34,9 @@ describe('built Harness client artifact', () => {
     }) as { apply?: unknown, inject?: unknown }
 
     expect(exported.apply).toBeTypeOf('function')
-    expect(exported.inject).toEqual(['slots', 'locale', 'settingsScope'])
+    // 0.2.0 serves settings through `ctx.configForms`; the removed
+    // `settingsScope` service no longer exists anywhere in the Harness.
+    expect(exported.inject).toEqual(['slots', 'locale', 'configForms'])
     const style = document.querySelector<HTMLStyleElement>(
       'style[data-plugin-css="dsh-context-compression-selector/CompressionProfileSelector.module.css"]',
     )

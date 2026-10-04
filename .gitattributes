@@ -15,3 +15,11 @@ packages/runtime/assets/** -text
 # Windows `core.autocrlf=true` clone rewrites every artifact and the committed
 # bytes stop matching what the build produced.
 packages/*/lib/** -text
+
+# The offline install package carries the same byte-exact tokenizer assets and
+# a distribution snapshot of the vendored JavaScript. Without this rule a
+# Windows `core.autocrlf=true` clone rewrites every vendored file on checkout,
+# and the installer then copies a CRLF tokenizer.json into the profile whose
+# SHA-256 no longer matches — which surfaces as a silent fail-open (no exact
+# counting, so no compression at all) rather than an obvious error.
+release-package/vendor/** -text

@@ -10,6 +10,7 @@ import {
   DEEPSEEK_V41_FLASH_TOKENIZER_ARTIFACT,
   deepSeekV4TokenizerForModel,
 } from './deepseek-v4-tokenizer.ts'
+import { isDeepSeekBilledProvider } from './deepseek-route.ts'
 import {
   DEEPSEEK_VISION_IMAGE_ESTIMATOR,
   estimateDeepSeekVisionImageTokens,
@@ -271,7 +272,7 @@ function bindCounter(provider: string | undefined, model: string | undefined): C
     const unavailable = () => unavailableTokenCount('canonical text: no durable provider/model request header')
     return { countText: unavailable, countImage: () => unavailableTokenCount('canonical image: no durable provider/model request header') }
   }
-  if (provider !== 'deepseek' && provider !== 'deepseek-official') {
+  if (!isDeepSeekBilledProvider(provider)) {
     const reason = `canonical text: provider "${provider}" is not the supported DeepSeek route`
     return { countText: () => unavailableTokenCount(reason), countImage: () => unavailableTokenCount(`canonical image: provider "${provider}" is not the supported DeepSeek route`) }
   }
@@ -331,7 +332,7 @@ function intrinsicImageDiagnostic(
   // Mirror the gating route: only the DeepSeek vision route carries the
   // official-arithmetic bounds.
   if (target === undefined
-    || (target.provider !== 'deepseek' && target.provider !== 'deepseek-official')
+    || !isDeepSeekBilledProvider(target.provider)
     || !VISION_MODEL_IDS.has(target.model)) return undefined
   let paddingMinimumTokens = 0
   let paddingMaximumTokens = 0

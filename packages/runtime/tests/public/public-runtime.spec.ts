@@ -450,6 +450,42 @@ describe('standalone runtime on published Harness APIs', () => {
     expect(record?.tokensRemoved).toBe((record?.tokensBefore ?? 0) - (record?.tokensAfter ?? 0))
   })
 
+  it('measures and rewrites exactly on the signed-in account route', async () => {
+    const ctx = await runtimeContext()
+    const audit = captureAudit(ctx)
+    await ctx.plugin(ToolResultPruner, {
+      profile: 'balanced',
+      freshTriggerTokens: 100,
+      freshTargetTokens: 64,
+      aggregateTriggerTokens: 100_000,
+      aggregateTargetTokens: 90_000,
+      historyTriggerTokens: 100_000,
+    }).await()
+    const session = Session.create(SessionId('public-fresh-account-route'))
+    appendToolTurn(session, 1, 'fresh account evidence '.repeat(1_000), false, undefined, 'deepseek-account')
+
+    const view = measureForCompaction(ctx, session)
+    expect(view.currentSurface.kind).toBe('exact-tokenizer')
+
+    const result = ctx.toolResultPruner.pruneSession(session, {
+      stage: 'fresh',
+      freshTurn: 1,
+      freshStep: 1,
+    })
+
+    expect(result.pruned).toHaveLength(1)
+    const record = rewrites(audit.records()).find(entry => entry.component === 'fresh')
+    expect(record).toMatchObject({
+      stage: 'fresh',
+      reducer: expect.any(String),
+      manifestEventType: 'compaction/prune',
+      tokenizerId: expect.any(String),
+      tokenizerRevision: expect.any(String),
+    })
+    expect(record?.tokensBefore).toBeGreaterThan(100)
+    expect(record?.tokensAfter).toBeLessThanOrEqual(64)
+  })
+
   it('proves isolated Aggregate while Fresh and History remain below their gates', async () => {
     const ctx = await runtimeContext()
     const audit = captureAudit(ctx)

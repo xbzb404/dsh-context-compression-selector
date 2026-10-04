@@ -100,6 +100,36 @@ describe('context compression selector Host preset integration', () => {
     expect(yaml).toContain('autoCompactThresholdPercent: 73')
   })
 
+  it('reads the threshold through the volatile reference the Host supplies', async () => {
+    // A `.volatile()` field does not reach apply() as its value: the Host hands
+    // it over as a cosmokit live reference, which is what keeps a running row in
+    // step with a settings edit. A plain-number test cannot see that difference,
+    // and reading the reference as a number used to throw inside the
+    // fire-and-forget publication, so no variant was ever registered.
+    const reference = { get: () => 73, [Symbol.for('cosmokit.volatile.write')]: () => {} }
+    const { registry } = await harness({
+      presetOverlay: true,
+      autoCompactThresholdPercent: reference as never,
+    })
+    await published(registry, 1)
+
+    const yaml = rowsYaml(registry.registered.get(`standard${DEFAULT_VARIANT_ID_SUFFIX}`)!.plugins as EntryOptions[])
+    expect(yaml).toContain('thresholdRatio: 0.73')
+    expect(yaml).toContain('autoCompactThresholdPercent: 73')
+  })
+
+  it('describes every variant with what it adds and the frozen threshold', async () => {
+    // The Host's own presets declare no description, so the picker would render
+    // "No description." for every variant without one.
+    const { registry } = await harness({ presetOverlay: true, autoCompactThresholdPercent: 73 })
+    await published(registry, 1)
+
+    const description = registry.registered.get(`standard${DEFAULT_VARIANT_ID_SUFFIX}`)?.description
+    expect(description).toContain('Context compression over the native standard preset')
+    expect(description).toContain('replaces native head/tail trimming')
+    expect(description).toContain('Auto Compact frozen at 73%')
+  })
+
   it('falls back to the pinned compaction defaults when no threshold is configured', async () => {
     const { registry } = await harness({ presetOverlay: true })
     await published(registry, 1)
