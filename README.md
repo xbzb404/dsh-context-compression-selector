@@ -4,6 +4,87 @@
 
 [中文说明](README.zh.md) · [Report an issue](https://github.com/xbzb404/dsh-context-compression-selector/issues)
 
+## Install on Windows 10/11 (no Node, no npm, no account)
+
+**The easy path: download, unpack, double-click.** Four steps, nothing to type.
+
+1. Click the green **`Code`** button at the top of this page → **`Download ZIP`**
+   (direct link: <https://github.com/xbzb404/dsh-context-compression-selector/archive/refs/heads/main.zip>).
+2. Unpack the zip anywhere, for example `D:\dsh-ctx` (right-click → *Extract All…*).
+3. **Quit DeepSeek Harness completely — including the tray icon** (right-click the tray icon → Quit).
+4. Double-click this file:
+
+   ```
+   D:\dsh-ctx\dsh-context-compression-selector-main\release-package\install.cmd
+   ```
+
+   If Windows shows a blue **“Windows protected your PC”** box, click **More info** → **Run anyway**. The script only copies files into your own Harness profile: it never downloads anything, never runs npm/pnpm, and never asks for an account.
+
+5. Wait until you see `=== done ===`, then start DeepSeek Harness again.
+
+The installer does all of this by itself:
+
+| step | what it does |
+|---|---|
+| 1 | backs up `%USERPROFILE%\.dsh\profiles\desktop\package.json` |
+| 2 | copies the 6 packages from its `vendor\` folder into `…\profiles\desktop\node_modules\` |
+| 3 | registers `dsh-context-compression-selector` in the profile's `dsh.profile.bundles` |
+| 4 | checks that every entry file landed, and names anything missing |
+
+Then open **Settings → Context compression**, choose the **Balanced** profile, and pick the `standard--compression` preset for new sessions (see [Profiles](#profiles)).
+
+### The same install, as commands
+
+Open **Command Prompt** (`Win + R`, type `cmd`, press Enter) and paste one line at a time.
+
+```cmd
+:: 1. download this repository as a zip
+powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol='Tls12'; Invoke-WebRequest -Uri 'https://github.com/xbzb404/dsh-context-compression-selector/archive/refs/heads/main.zip' -OutFile '%USERPROFILE%\Downloads\dsh-ctx.zip'"
+
+:: 2. unpack it
+powershell -NoProfile -Command "Expand-Archive -Path '%USERPROFILE%\Downloads\dsh-ctx.zip' -DestinationPath '%USERPROFILE%\Downloads\dsh-ctx' -Force"
+
+:: 3. quit DeepSeek Harness first (tray icon -> Quit), then install
+"%USERPROFILE%\Downloads\dsh-ctx\dsh-context-compression-selector-main\release-package\install.cmd"
+```
+
+Already have `git`? Then it is two lines:
+
+```cmd
+git clone https://github.com/xbzb404/dsh-context-compression-selector.git
+dsh-context-compression-selector\release-package\install.cmd
+```
+
+Other profiles and other Harness homes:
+
+```cmd
+:: install into a profile other than "desktop"
+...\release-package\install.cmd myprofile
+
+:: the Harness home is not %USERPROFILE%\.dsh
+set DSH_HOME=D:\dsh-home
+...\release-package\install.cmd
+
+:: print the built-in help
+...\release-package\install.cmd --help
+```
+
+### If something goes wrong
+
+| what you see | what to do |
+|---|---|
+| `[X] DeepSeek Harness is running.` | Quit it completely — the tray icon too — and run the script again. |
+| `[X] no Harness profile at …` | Start DeepSeek Harness once so it creates the profile, quit it, then run the script again. |
+| You want the previous state back | The script prints its backup path, e.g. `copy /Y "…\package.json.bak-install-12345" "…\package.json"`, and you can then delete `dsh-context-compression-selector`, `dsh-context-compression-selector-runtime`, `js-yaml`, `@huggingface`, `@deepseek-ai\dsh-compaction-basic` and `@deepseek-ai\dsh-command-compact` from `…\profiles\desktop\node_modules`. |
+| Nothing new appears in Settings | The Host half loads at startup: restart the app. Compression also needs the `--compression` preset picked for the session. |
+
+<details>
+<summary>Why not <code>npm</code>/<code>pnpm</code> or the <code>dsh</code> CLI?</summary>
+
+The desktop profile is owned by the Electron application, and the plugin's runtime is a prerelease package that is not on npm. Any package-manager run rewrites `node_modules` right before launch, and Harness hashes each client bundle's `mtimeMs`/`ctimeMs`/`size` into the module-graph revision it bakes into the served page — so the renderer then requests stale URLs and the whole settings panel fails to load. A plain file copy, performed while the app is closed, avoids both problems. See [`release-package/README.md`](release-package/README.md) for the details.
+</details>
+
+
 > [!NOTE]
 > **This repository is a personal fork**, derived from the original
 > `dsh-context-compression-selector` project and maintained here as a standalone

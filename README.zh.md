@@ -4,6 +4,87 @@
 
 [English README](README.md) · [提交问题](https://github.com/xbzb404/dsh-context-compression-selector/issues)
 
+## 安装（Windows 10/11，无需 Node / npm / 账号）
+
+**最省事的办法：下载 → 解压 → 双击。** 四步，不用敲任何命令。
+
+1. 在本页点绿色的 **`Code`** 按钮 → **`Download ZIP`**
+   （直接下载链接：<https://github.com/xbzb404/dsh-context-compression-selector/archive/refs/heads/main.zip>）。
+2. 把 zip 解压到任意目录，例如 `D:\dsh-ctx`（右键 →「全部解压缩」）。
+3. **完全退出 DeepSeek Harness —— 连托盘图标也要退出**（右键托盘图标 → 退出）。
+4. 双击这个文件：
+
+   ```
+   D:\dsh-ctx\dsh-context-compression-selector-main\release-package\install.cmd
+   ```
+
+   如果弹出蓝色的「Windows 已保护你的电脑」提示，点 **更多信息** → **仍要运行**。这个脚本只是往你自己的 Harness 配置目录里复制文件：不联网下载、不调用 npm/pnpm、也不需要注册或登录任何账号。
+
+5. 看到 `=== done ===` 之后，重新启动 DeepSeek Harness。
+
+安装脚本会自动完成这些事：
+
+| 步骤 | 做什么 |
+|---|---|
+| 1 | 备份 `%USERPROFILE%\.dsh\profiles\desktop\package.json` |
+| 2 | 把它 `vendor\` 里的 6 个包复制到 `…\profiles\desktop\node_modules\` |
+| 3 | 把 `dsh-context-compression-selector` 注册进该 Profile 的 `dsh.profile.bundles` |
+| 4 | 逐项检查入口文件是否到位，缺什么就直接告诉你 |
+
+然后打开 **设置 → Context compression**，Profile 选 **Balanced**，新会话请选用 `standard--compression` 预设（详见[模式说明](#profile-一览)）。
+
+### 同样的安装，用命令完成
+
+按 `Win + R`，输入 `cmd` 回车打开**命令提示符**，一行一行粘贴执行。
+
+```cmd
+:: 1. 下载本仓库的 zip
+powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol='Tls12'; Invoke-WebRequest -Uri 'https://github.com/xbzb404/dsh-context-compression-selector/archive/refs/heads/main.zip' -OutFile '%USERPROFILE%\Downloads\dsh-ctx.zip'"
+
+:: 2. 解压
+powershell -NoProfile -Command "Expand-Archive -Path '%USERPROFILE%\Downloads\dsh-ctx.zip' -DestinationPath '%USERPROFILE%\Downloads\dsh-ctx' -Force"
+
+:: 3. 先完全退出 DeepSeek Harness（含托盘图标），再安装
+"%USERPROFILE%\Downloads\dsh-ctx\dsh-context-compression-selector-main\release-package\install.cmd"
+```
+
+已经装了 `git` 的话，两行就够：
+
+```cmd
+git clone https://github.com/xbzb404/dsh-context-compression-selector.git
+dsh-context-compression-selector\release-package\install.cmd
+```
+
+装到别的 Profile、或 Harness 家目录不在默认位置：
+
+```cmd
+:: 装到 desktop 以外的 Profile
+...\release-package\install.cmd myprofile
+
+:: Harness 家目录不是 %USERPROFILE%\.dsh
+set DSH_HOME=D:\dsh-home
+...\release-package\install.cmd
+
+:: 查看内置帮助
+...\release-package\install.cmd --help
+```
+
+### 出问题了怎么办
+
+| 你看到的 | 怎么处理 |
+|---|---|
+| `[X] DeepSeek Harness is running.` | 没退干净。连托盘图标一起退出后重新运行脚本。 |
+| `[X] no Harness profile at …` | 先启动一次 DeepSeek Harness 让它生成 Profile，退出后再运行脚本。 |
+| 想恢复原状 | 脚本会打印备份路径，例如 `copy /Y "…\package.json.bak-install-12345" "…\package.json"`；随后从 `…\profiles\desktop\node_modules` 里删掉 `dsh-context-compression-selector`、`dsh-context-compression-selector-runtime`、`js-yaml`、`@huggingface`、`@deepseek-ai\dsh-compaction-basic`、`@deepseek-ai\dsh-command-compact` 六个文件夹即可。 |
+| 设置里没出现新东西 | Host 半边在启动时加载，请重启应用；另外该会话必须选用 `--compression` 预设才会真正压缩。 |
+
+<details>
+<summary>为什么不用 <code>npm</code>/<code>pnpm</code> 或 <code>dsh</code> 命令安装？</summary>
+
+桌面版 Profile 由 Electron 应用自己管理，而本插件的 runtime 是未发布到 npm 的预发布包。任何包管理器执行都会在启动前重写 `node_modules`，而 Harness 会把每个客户端 bundle 的 `mtimeMs`/`ctimeMs`/`size` 哈希进它烘焙到页面里的模块图 revision——于是渲染进程请求到的是失效 URL，整个设置面板都会加载失败。在应用关闭时做纯文件复制可以同时避开这两个问题；完整说明见 [`release-package/README.md`](release-package/README.md)。
+</details>
+
+
 > [!NOTE]
 > **本仓库是个人 fork**，派生自原 `dsh-context-compression-selector` 项目，
 > 现作为个人仓库独立维护。原项目的设计、实现与配套课件均为上游作者的工作；
