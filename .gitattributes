@@ -1,0 +1,17 @@
+# The bundled DeepSeek tokenizer assets are byte-exact: their SHA-256 is
+# verified at load time and any line-ending conversion breaks that check.
+# Force binary (LF-preserving) checkout for every asset under the tokenizer
+# directories so a Windows `core.autocrlf=true` checkout cannot corrupt them.
+#
+# The license files are covered too: the manifests hash them alongside the
+# tokenizer, and a CRLF checkout of a `.txt` license inflates it by exactly one
+# byte per line, which surfaces as `byte length differs from manifest` in
+# `verify:release`.
+packages/runtime/assets/** -text
+
+# Build output ships through git (see .gitignore): a `pnpm add git+https://...`
+# install never runs `prepack`, so it consumes `lib/` exactly as committed. The
+# artifacts are generated with LF, so pin LF on checkout as well — otherwise a
+# Windows `core.autocrlf=true` clone rewrites every artifact and the committed
+# bytes stop matching what the build produced.
+packages/*/lib/** -text

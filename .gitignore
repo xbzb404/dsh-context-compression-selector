@@ -1,0 +1,23 @@
+node_modules/
+dist/
+coverage/
+*.tgz
+*.tsbuildinfo
+*.log
+.env
+.env.*
+!.env.example
+.DS_Store
+.pnpm-store/
+release-artifacts/
+
+# `pnpm add git+https://...` never runs `prepack`, so a git install only works
+# if the built entry points travel with the source. Keep `lib/` tracked for
+# both packages; everything else under it stays ignored.
+!packages/*/lib/
+packages/*/lib/**/*.map
+packages/*/lib/**/*.tsbuildinfo
+
+# AgentTeams runtime state (rosters, task ledgers, mailboxes) is local
+# coordination state, not project source.
+.agent-teams/
