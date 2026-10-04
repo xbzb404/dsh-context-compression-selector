@@ -76,6 +76,16 @@ export interface PresetOverlayOptions {
   readonly autoCompactThresholdPercent?: () => number | undefined
   /** Appended to the source preset id to name its variant. */
   readonly idSuffix?: string
+  /**
+   * Display name of the source preset inside the variant name.
+   *
+   * The Host declares its shipped presets without a name — the picker supplies
+   * "标准模式" / "Standard mode" from its own dictionary — so a variant built from
+   * `preset.name ?? preset.id` would read "standard · …" in both languages.
+   * Returning `undefined` keeps that fallback, which is what a user-authored
+   * preset (which does declare a name) needs.
+   */
+  readonly displayName?: (source: AgentPreset) => string | undefined
   /** Appended to the source preset's display name. */
   readonly displaySuffix?: string
   /**
@@ -291,9 +301,10 @@ class VariantPublisher {
       try {
         const rows = await this.composeRows(preset.id)
         const description = this.options.describeVariant?.(preset) ?? preset.description
+        const source = this.options.displayName?.(preset) ?? preset.name ?? preset.id
         const release = await this.registry.register({
           id,
-          name: `${preset.name ?? preset.id} · ${this.options.displaySuffix ?? DEFAULT_DISPLAY_SUFFIX}`,
+          name: `${source} · ${this.options.displaySuffix ?? DEFAULT_DISPLAY_SUFFIX}`,
           ...(description === undefined ? {} : { description }),
           ...(preset.order === undefined ? {} : { order: preset.order }),
           plugins: rows,

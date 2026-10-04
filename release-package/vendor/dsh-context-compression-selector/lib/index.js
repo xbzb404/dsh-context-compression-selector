@@ -148,9 +148,10 @@ var VariantPublisher = class {
 			try {
 				const rows = await this.composeRows(preset.id);
 				const description = this.options.describeVariant?.(preset) ?? preset.description;
+				const source = this.options.displayName?.(preset) ?? preset.name ?? preset.id;
 				const release = await this.registry.register({
 					id,
-					name: `${preset.name ?? preset.id} · ${this.options.displaySuffix ?? DEFAULT_DISPLAY_SUFFIX}`,
+					name: `${source} · ${this.options.displaySuffix ?? DEFAULT_DISPLAY_SUFFIX}`,
 					...description === void 0 ? {} : { description },
 					...preset.order === void 0 ? {} : { order: preset.order },
 					plugins: rows
@@ -348,6 +349,84 @@ const Config = z.object({
 	autoCompactThresholdPercent: volatileField(z.number().step(1).min(AUTO_COMPACT_THRESHOLD_LIMITS.min).max(AUTO_COMPACT_THRESHOLD_LIMITS.max).default(AUTO_COMPACT_THRESHOLD_LIMITS.default)),
 	presetOverlay: z.boolean().default(false)
 });
+/** The shipped preset names the client's own `zh` dictionary uses. */
+const SHIPPED_NAMES_ZH = {
+	standard: "标准模式",
+	ptc: "PTC 模式",
+	minimal: "极简模式",
+	cordis: "创造模式"
+};
+/** The shipped preset names the client's own `en` dictionary uses. */
+const SHIPPED_NAMES_EN = {
+	standard: "Standard mode",
+	ptc: "PTC mode",
+	minimal: "Minimal mode",
+	cordis: "Creator mode"
+};
+/** Display name of one source preset in one language. */
+function sourceDisplayName(source, names) {
+	return source.name ?? names[source.id] ?? source.id;
+}
+const VARIANT_COPY = {
+	en: {
+		displaySuffix: "Context compression",
+		shippedNames: SHIPPED_NAMES_EN,
+		describe: (source, thresholdPercent) => [
+			`Context compression over ${source.description ?? `the native ${source.id} preset`}.`,
+			"The selector's compression stack — fresh, aggregate and history budgets plus recoverable tool-result pruning — replaces native head/tail trimming.",
+			`Auto Compact frozen at ${String(thresholdPercent)}%.`
+		].join(" ")
+	},
+	zh: {
+		displaySuffix: "上下文压缩",
+		shippedNames: SHIPPED_NAMES_ZH,
+		describe: (source, thresholdPercent) => [
+			`在「${sourceDisplayName(source, SHIPPED_NAMES_ZH)}」的基础上启用上下文压缩：`,
+			"Fresh 预压缩刚变大的工具结果、Aggregate 在仍超预算时再次压缩、History 回收旧的工具结果并保留近期上下文，取代原生首尾裁剪。",
+			`本次生成冻结的 Auto Compact 水位为 ${String(thresholdPercent)}%。`,
+			"新建任务时选择本模式即可生效；Profile 与水位在「设置 → Context compression」中调整。"
+		].join("")
+	}
+};
+/** Settings namespace the locale plugin owns; its row carries the UI language. */
+const LOCALE_SETTINGS_NAMESPACE = "locale";
+/** Field carrying an explicit language selection inside that namespace. */
+const LOCALE_PREFERENCE_FIELD = "preference";
+/** Accepted BCP 47-style language ids, mirroring the locale plugin's schema. */
+const LOCALE_ID_PATTERN = /^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*$/u;
+/**
+* Resolve the language the variant copy is written in.
+*
+* Order: the user's explicit choice in the settings document, then the process
+* locale, then English. Reading the settings document is deliberately optional —
+* a service that is not mounted yet, a document that has not loaded, or a
+* rejected read only costs the explicit preference and falls back to the
+* process locale, which is what an unset preference means anyway.
+*/
+function resolveVariantLocale(ctx) {
+	return (localePreference(ctx) ?? processLocale())?.toLowerCase().startsWith("zh") === true ? "zh" : "en";
+}
+/** The user's saved language choice, read from the settings document. */
+function localePreference(ctx) {
+	try {
+		const rows = ctx.get("settings")?.describe?.();
+		if (!Array.isArray(rows)) return void 0;
+		for (const row of rows) {
+			const entry = row;
+			if (entry.ns !== LOCALE_SETTINGS_NAMESPACE) continue;
+			const chosen = entry.user?.[LOCALE_PREFERENCE_FIELD] ?? entry.value?.[LOCALE_PREFERENCE_FIELD];
+			if (typeof chosen === "string" && LOCALE_ID_PATTERN.test(chosen)) return chosen;
+		}
+	} catch {}
+}
+/** The running process locale, used when no explicit preference is saved. */
+function processLocale() {
+	try {
+		return new Intl.DateTimeFormat().resolvedOptions().locale;
+	} catch {
+		return;
+	}
+}
 /**
 * Bundle Host entry.
 *
@@ -363,15 +442,14 @@ function apply(ctx, config = {}) {
 	if (fieldValue(config.presetOverlay) !== true) return;
 	ctx.inject(["agentPresets"], (presetsCtx) => {
 		const thresholdPercent = () => fieldValue(config.autoCompactThresholdPercent) ?? AUTO_COMPACT_THRESHOLD_LIMITS.default;
+		const copy = VARIANT_COPY[resolveVariantLocale(ctx)];
 		const installation = installCompressionVariants(presetsCtx.agentPresets, {
 			modules: resolveCompressionModulePaths(),
 			excludedPresetIds: ["minimal"],
 			autoCompactThresholdPercent: thresholdPercent,
-			describeVariant: (source) => [
-				`Context compression over ${source.description ?? `the native ${source.id} preset`}.`,
-				"The selector's compression stack — fresh, aggregate and history budgets plus recoverable tool-result pruning — replaces native head/tail trimming.",
-				`Auto Compact frozen at ${String(thresholdPercent())}%.`
-			].join(" ")
+			displayName: (source) => sourceDisplayName(source, copy.shippedNames),
+			displaySuffix: copy.displaySuffix,
+			describeVariant: (source) => copy.describe(source, thresholdPercent())
 		});
 		presetsCtx.effect(() => () => installation.dispose(), "contextCompressionSelector.agentPresets()");
 		installation.ready().catch((error) => {

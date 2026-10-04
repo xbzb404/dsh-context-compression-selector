@@ -44,13 +44,35 @@ class FakeAgentPresets extends Service implements PresetVariantRegistry {
   }
 }
 
-async function harness(options: Parameters<typeof apply>[1] = {}): Promise<{
+/** A settings-service double carrying the locale row the Language setting writes. */
+class FakeSettings extends Service {
+  private readonly preference: string | undefined
+
+  constructor(context: Context, preference: string | undefined) {
+    super(context, 'settings')
+    this.preference = preference
+  }
+
+  /** Mirrors the descriptor shape `describe()` returns: a row per settings namespace. */
+  describe(): readonly unknown[] {
+    return this.preference === undefined
+      ? []
+      : [{ ns: 'locale', user: { preference: this.preference } }]
+  }
+}
+
+async function harness(
+  options: Parameters<typeof apply>[1] = {},
+  // Pinned so variant-copy assertions cannot depend on the machine's own locale.
+  locale = 'en',
+): Promise<{
   runtime: Context
   registry: FakePresetRegistry
   selector: ReturnType<Context['plugin']>
 }> {
   const runtime = new Context()
   ctx = runtime
+  await runtime.plugin(FakeSettings, locale).await()
   await runtime.plugin(FakeAgentPresets, SOURCES).await()
   const registry = (runtime as unknown as { agentPresets: FakeAgentPresets }).agentPresets.registry
   const selector = runtime.plugin({ apply: child => apply(child, options) })
@@ -118,16 +140,30 @@ describe('context compression selector Host preset integration', () => {
     expect(yaml).toContain('autoCompactThresholdPercent: 73')
   })
 
-  it('describes every variant with what it adds and the frozen threshold', async () => {
-    // The Host's own presets declare no description, so the picker would render
-    // "No description." for every variant without one.
-    const { registry } = await harness({ presetOverlay: true, autoCompactThresholdPercent: 73 })
+  it('writes the variant copy in the interface language (English)', async () => {
+    // The Host's own presets declare neither a name nor a description, and the
+    // picker only localizes a shipped preset that publishes no name — a row that
+    // names itself is rendered verbatim. A variant therefore has to carry both
+    // its name suffix and its description.
+    const { registry } = await harness({ presetOverlay: true, autoCompactThresholdPercent: 73 }, 'en')
     await published(registry, 1)
 
-    const description = registry.registered.get(`standard${DEFAULT_VARIANT_ID_SUFFIX}`)?.description
-    expect(description).toContain('Context compression over the native standard preset')
-    expect(description).toContain('replaces native head/tail trimming')
-    expect(description).toContain('Auto Compact frozen at 73%')
+    const variant = registry.registered.get(`standard${DEFAULT_VARIANT_ID_SUFFIX}`)
+    expect(variant?.name).toBe('Standard mode · Context compression')
+    expect(variant?.description).toContain('Context compression over the native standard preset')
+    expect(variant?.description).toContain('replaces native head/tail trimming')
+    expect(variant?.description).toContain('Auto Compact frozen at 73%')
+  })
+
+  it('writes the variant copy in the interface language (Chinese)', async () => {
+    const { registry } = await harness({ presetOverlay: true, autoCompactThresholdPercent: 73 }, 'zh')
+    await published(registry, 1)
+
+    const variant = registry.registered.get(`standard${DEFAULT_VARIANT_ID_SUFFIX}`)
+    expect(variant?.name).toBe('标准模式 · 上下文压缩')
+    expect(variant?.description).toContain('在「标准模式」的基础上启用上下文压缩')
+    expect(variant?.description).toContain('取代原生首尾裁剪')
+    expect(variant?.description).toContain('Auto Compact 水位为 73%')
   })
 
   it('falls back to the pinned compaction defaults when no threshold is configured', async () => {

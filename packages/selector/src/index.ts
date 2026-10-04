@@ -103,6 +103,135 @@ export const Config: z<Config> = z.object({
   presetOverlay: z.boolean().default(false),
 })
 
+/** The roster-row fields the variant copy reads. */
+interface VariantSource {
+  readonly id: string
+  readonly name?: string | undefined
+  readonly description?: string | undefined
+}
+
+/**
+ * Display copy for the derived variants, in the two languages the Harness
+ * client ships (`LOCALE_IDS`: `zh`, `en`).
+ *
+ * The picker localizes a *shipped* preset from its own dictionaries and offers
+ * the "模式说明 / 如何使用" reader — but only for a roster row that publishes no
+ * name and whose id is one of the four shipped presets: the row text comes from
+ * `isBuiltInPreset(preset) ? dictionary[preset.id] : preset.{name,description}`,
+ * and the reader's table is consulted as `trust === "system" && table.has(id)`.
+ * A plugin-declared variant publishes a name, so it is always rendered verbatim
+ * from this copy, and that reader is unreachable for it by construction — the
+ * description below therefore has to say what the reader would have said.
+ */
+interface VariantCopy {
+  /** Appended to the source preset's display name. */
+  readonly displaySuffix: string
+  /** Display names for the shipped presets, which publish none of their own. */
+  readonly shippedNames: Readonly<Record<string, string>>
+  /** Picker description standing in for the reader a variant cannot open. */
+  describe(source: VariantSource, thresholdPercent: number): string
+}
+
+/** The shipped preset names the client's own `zh` dictionary uses. */
+const SHIPPED_NAMES_ZH: Readonly<Record<string, string>> = {
+  standard: '标准模式',
+  ptc: 'PTC 模式',
+  minimal: '极简模式',
+  cordis: '创造模式',
+}
+
+/** The shipped preset names the client's own `en` dictionary uses. */
+const SHIPPED_NAMES_EN: Readonly<Record<string, string>> = {
+  standard: 'Standard mode',
+  ptc: 'PTC mode',
+  minimal: 'Minimal mode',
+  cordis: 'Creator mode',
+}
+
+/** Display name of one source preset in one language. */
+function sourceDisplayName(source: VariantSource, names: Readonly<Record<string, string>>): string {
+  return source.name ?? names[source.id] ?? source.id
+}
+
+const VARIANT_COPY: Readonly<Record<'en' | 'zh', VariantCopy>> = {
+  en: {
+    displaySuffix: 'Context compression',
+    shippedNames: SHIPPED_NAMES_EN,
+    // Wording kept stable: it is what the picker shows next to the variant name.
+    describe: (source, thresholdPercent) => [
+      `Context compression over ${source.description ?? `the native ${source.id} preset`}.`,
+      'The selector\'s compression stack — fresh, aggregate and history budgets plus recoverable '
+      + 'tool-result pruning — replaces native head/tail trimming.',
+      `Auto Compact frozen at ${String(thresholdPercent)}%.`,
+    ].join(' '),
+  },
+  zh: {
+    displaySuffix: '上下文压缩',
+    shippedNames: SHIPPED_NAMES_ZH,
+    describe: (source, thresholdPercent) => [
+      `在「${sourceDisplayName(source, SHIPPED_NAMES_ZH)}」的基础上启用上下文压缩：`,
+      'Fresh 预压缩刚变大的工具结果、Aggregate 在仍超预算时再次压缩、'
+      + 'History 回收旧的工具结果并保留近期上下文，取代原生首尾裁剪。',
+      `本次生成冻结的 Auto Compact 水位为 ${String(thresholdPercent)}%。`,
+      '新建任务时选择本模式即可生效；Profile 与水位在「设置 → Context compression」中调整。',
+    ].join(''),
+  },
+}
+
+/** Settings namespace the locale plugin owns; its row carries the UI language. */
+const LOCALE_SETTINGS_NAMESPACE = 'locale'
+
+/** Field carrying an explicit language selection inside that namespace. */
+const LOCALE_PREFERENCE_FIELD = 'preference'
+
+/** Accepted BCP 47-style language ids, mirroring the locale plugin's schema. */
+const LOCALE_ID_PATTERN = /^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*$/u
+
+/**
+ * Resolve the language the variant copy is written in.
+ *
+ * Order: the user's explicit choice in the settings document, then the process
+ * locale, then English. Reading the settings document is deliberately optional —
+ * a service that is not mounted yet, a document that has not loaded, or a
+ * rejected read only costs the explicit preference and falls back to the
+ * process locale, which is what an unset preference means anyway.
+ */
+function resolveVariantLocale(ctx: Context): 'en' | 'zh' {
+  const locale = localePreference(ctx) ?? processLocale()
+  return locale?.toLowerCase().startsWith('zh') === true ? 'zh' : 'en'
+}
+
+/** The user's saved language choice, read from the settings document. */
+function localePreference(ctx: Context): string | undefined {
+  try {
+    const settings = ctx.get('settings') as { describe?: () => unknown } | undefined
+    const rows = settings?.describe?.()
+    if (!Array.isArray(rows)) return undefined
+    for (const row of rows) {
+      const entry = row as {
+        ns?: unknown
+        user?: Record<string, unknown>
+        value?: Record<string, unknown>
+      }
+      if (entry.ns !== LOCALE_SETTINGS_NAMESPACE) continue
+      const chosen = entry.user?.[LOCALE_PREFERENCE_FIELD] ?? entry.value?.[LOCALE_PREFERENCE_FIELD]
+      if (typeof chosen === 'string' && LOCALE_ID_PATTERN.test(chosen)) return chosen
+    }
+  } catch {
+    // Localization is cosmetic: never let it break variant publication.
+  }
+  return undefined
+}
+
+/** The running process locale, used when no explicit preference is saved. */
+function processLocale(): string | undefined {
+  try {
+    return new Intl.DateTimeFormat().resolvedOptions().locale
+  } catch {
+    return undefined
+  }
+}
+
 /**
  * Bundle Host entry.
  *
@@ -120,6 +249,7 @@ export function apply(ctx: Context, config: Config = {}): void {
   ctx.inject(['agentPresets'], (presetsCtx) => {
     const thresholdPercent = (): number =>
       fieldValue(config.autoCompactThresholdPercent) ?? AUTO_COMPACT_THRESHOLD_LIMITS.default
+    const copy = VARIANT_COPY[resolveVariantLocale(ctx)]
     const installation = installCompressionVariants(
       presetsCtx.agentPresets,
       {
@@ -130,16 +260,15 @@ export function apply(ctx: Context, config: Config = {}): void {
         // double, or a future caller that composes `apply` directly). The field
         // is volatile, so it is read through the reference it arrives as.
         autoCompactThresholdPercent: thresholdPercent,
-        // The Host declares its own presets without a description, so a variant
-        // would show "No description." beside a name that only repeats the source
-        // id. Say what the variant adds, and the threshold this generation froze
-        // into its rows.
-        describeVariant: source => [
-          `Context compression over ${source.description ?? `the native ${source.id} preset`}.`,
-          'The selector\'s compression stack — fresh, aggregate and history budgets plus recoverable '
-          + 'tool-result pruning — replaces native head/tail trimming.',
-          `Auto Compact frozen at ${String(thresholdPercent())}%.`,
-        ].join(' '),
+        // The Host declares its own presets without a name or a description, so
+        // a variant would show "No description." beside a name that only
+        // repeated the source id — and the picker localizes that row from
+        // nothing, because it only translates a shipped preset that publishes
+        // no name. The variant therefore carries its own localized name suffix
+        // and description; see {@link VARIANT_COPY}.
+        displayName: source => sourceDisplayName(source, copy.shippedNames),
+        displaySuffix: copy.displaySuffix,
+        describeVariant: source => copy.describe(source, thresholdPercent()),
       },
     )
     presetsCtx.effect(() => () => installation.dispose(), 'contextCompressionSelector.agentPresets()')
