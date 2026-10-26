@@ -2,6 +2,8 @@
 
 > 面向 DeepSeek Harness 的、可审计的工具结果上下文压缩选择器。
 
+Compatible with: dsh `0.2.1-rc.3`（适配 `0.2.x`，已在 DeepSeek Harness 桌面端 `0.2.1-rc.3` 实测）。
+
 [English README](README.md) · [提交问题](https://github.com/xbzb404/dsh-context-compression-selector/issues)
 
 ## 安装（Windows 10/11，无需 Node / npm / 账号）

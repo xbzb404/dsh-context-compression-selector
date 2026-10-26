@@ -9,4 +9,5 @@ peerDependencyRules:
 
 allowBuilds:
   esbuild: true
+  koffi: true
   "@huggingface/tokenizers": true

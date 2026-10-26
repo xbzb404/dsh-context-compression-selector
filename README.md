@@ -2,6 +2,8 @@
 
 > An auditable tool-result context-compression selector for DeepSeek Harness.
 
+Compatible with: dsh `0.2.1-rc.3` (works on `0.2.x`; tested against DeepSeek Harness Desktop `0.2.1-rc.3`).
+
 [中文说明](README.zh.md) · [Report an issue](https://github.com/xbzb404/dsh-context-compression-selector/issues)
 
 ## Install on Windows 10/11 (no Node, no npm, no account)
