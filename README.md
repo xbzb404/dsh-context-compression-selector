@@ -6,6 +6,30 @@ Compatible with: dsh `0.2.1-rc.3` (works on `0.2.x`; tested against DeepSeek Har
 
 [中文说明](README.zh.md) · [Report an issue](https://github.com/xbzb404/dsh-context-compression-selector/issues)
 
+## Install
+
+One command, installed straight from this repository:
+
+```sh
+dsh plugin add github:xbzb404/dsh-context-compression-selector
+dsh --dump-config   # the selector layer should be listed
+```
+
+`dsh plugin add` resolves this repository root as the Bundle: it ships the built
+`packages/selector/lib`, the `cordis.patch.yml` layer, and the browser half, so
+nothing is compiled on your machine. The internal runtime package
+(`dsh-context-compression-selector-runtime`) is the only piece that comes from a
+registry — pnpm refuses git sub-dependencies — and it is resolved automatically.
+
+To update or remove it:
+
+```sh
+dsh plugin up dsh-context-compression-selector
+dsh plugin remove dsh-context-compression-selector
+```
+
+For the no-command path (Windows, no Node/npm/account), see below.
+
 ## Install on Windows 10/11 (no Node, no npm, no account)
 
 **The easy path: download, unpack, double-click.** Four steps, nothing to type.
@@ -243,18 +267,16 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for development expectations, [SECURITY.m
 
 ## Install
 
-Install the single Bundle entry package into a Harness profile:
+Install the Bundle straight from this repository (see [Install](#install) above):
 
 ```sh
-dsh plugin --profile <profile> add dsh-context-compression-selector@latest
-dsh --profile <profile> --dump-config
+dsh plugin add github:xbzb404/dsh-context-compression-selector
+dsh --dump-config
 ```
 
-The selector package declares the Harness Bundle manifest field `dsh.bundle.patch`, so `dsh plugin --profile <name> add <package>` is the standard DeepSeek Harness installation path for an out-of-tree Bundle. Its exact-version runtime dependency, `dsh-context-compression-selector-runtime`, is installed automatically; do not install or wire the two packages separately.
+The repository root carries the Harness Bundle manifest field `dsh.bundle.patch`, so `dsh plugin add <github spec>` is the standard DeepSeek Harness installation path for an out-of-tree Bundle. Its exact-version runtime dependency, `dsh-context-compression-selector-runtime`, is resolved from the registry automatically; do not install or wire the two packages separately.
 
-> **Version notice.** The published `latest` channel currently carries the **`0.1.1`** line, which targets Harness `dsh-v0.1.1-rc.2`. This branch is **`0.2.0-rc.1`** and targets Harness **`0.2.0-rc.2`**. It is a local working tree and is **not yet published**, so `@latest` will **not** give you this code. If your profile is on `0.2.0-rc.2`, install from source instead — see below.
->
-> Do not install the `0.1.1` line into a `0.2.0-rc.2` profile (or the reverse): `0.1.1` decorates preset paths, which `0.2.0` removed, so it fails to load.
+> **Naming notice.** The plain npm names `dsh-context-compression-selector` and `dsh-context-compression-selector-runtime` belong to the upstream project this fork fixes. Do **not** install `dsh-context-compression-selector@latest` — that pulls upstream's build, not this one. Install from the GitHub spec above.
 
 Restart the selected profile after installation. The config dump should list the selector Bundle as active.
 
@@ -320,11 +342,13 @@ node scripts/install-from-tarballs.mjs --profile <profile>
 
 It backs up `package.json` first, so a failure can be rolled back from the backup. Optional flags: `--registry <url>`, `--dry-run`.
 
-#### Why `dsh plugin add github:owner/repo` does not work
+#### How the `dsh plugin add github:` path works
 
-Installing straight from GitHub fails for the same root cause: **pnpm resolves a git dependency's own dependencies from the registry only** and does no relative resolution inside the checkout. The selector's exact-version runtime dependency therefore still fails. (Everything before that step is already in place: the repository root is a workspace container whose `package.json` carries the `dsh.bundle` declaration, and build output is committed — only this one dependency resolution blocks it.)
+pnpm resolves a git dependency's own dependencies from the registry only and does no relative resolution inside the checkout — and since pnpm 10 it rejects git/URL *sub*dependencies outright (`ERR_PNPM_EXOTIC_SUBDEP`). That is why exactly one piece, the runtime, is published to a registry under the maintainer scope and mapped back to its original name through an `npm:` alias in the root manifest. Everything else — host half, browser half, patch layer, build output — travels in the git checkout, so `lib/` is committed and no build runs on the user's machine.
 
-Publishing the runtime to a registry is the only way to make that path work; until then, use the tarball flow above.
+Rebuilding or republishing the runtime: `node scripts/publish-runtime.mjs` (dry run) / `--publish`.
+
+The tarball flow below still works for offline machines.
 
 The selector registers itself through the Bundle manifest field `dsh.bundle.patch`, so it also has to appear in the profile's bundle list (`package.json` → `dsh.profile.bundles`) before a restart picks it up:
 

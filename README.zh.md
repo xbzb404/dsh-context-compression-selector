@@ -6,6 +6,29 @@ Compatible with: dsh `0.2.1-rc.3`（适配 `0.2.x`，已在 DeepSeek Harness 桌
 
 [English README](README.md) · [提交问题](https://github.com/xbzb404/dsh-context-compression-selector/issues)
 
+## 安装
+
+一条命令，直接从本仓库安装：
+
+```sh
+dsh plugin add github:xbzb404/dsh-context-compression-selector
+dsh --dump-config   # 能看到 selector 这一层即为装好
+```
+
+`dsh plugin add` 会把本仓库根目录当作 Bundle：里面已带编译好的
+`packages/selector/lib`、`cordis.patch.yml` 层与浏览器端代码，本机不需要构建。
+内部运行时包（`dsh-context-compression-selector-runtime`）是唯一走 registry 的一环
+——pnpm 不允许 git 子依赖——安装时会自动解析。
+
+升级 / 卸载：
+
+```sh
+dsh plugin up dsh-context-compression-selector
+dsh plugin remove dsh-context-compression-selector
+```
+
+不想敲命令（Windows、无需 Node/npm/账号）请看下面的离线安装。
+
 ## 安装（Windows 10/11，无需 Node / npm / 账号）
 
 **最省事的办法：下载 → 解压 → 双击。** 四步，不用敲任何命令。
@@ -295,16 +318,18 @@ node scripts/install-from-tarballs.mjs --profile <profile>
 
 脚本会先备份 `package.json`；失败时可直接从备份回滚。可选参数：`--registry <url>`、`--dry-run`。
 
-#### 为什么不能直接 `dsh plugin add github:owner/repo`
+#### `dsh plugin add github:` 这条路径现在是怎么通的
 
-从 GitHub 直接安装同样走不通，原因是同一个：**pnpm 解析 git 依赖的自身依赖时只查 registry**，不做仓库内相对解析。因此选择器那个精确版本依赖照旧会失败。（另注：本仓库根目录是一个工作区容器，`dsh.bundle` 声明在根上，构建产物已随仓库提交，所以前几步是通的 —— 卡点只在 runtime 依赖。）
+pnpm 解析 git 依赖的自身依赖时只查 registry，不做仓库内相对解析；pnpm 10 起更是直接禁止 git/URL 形式的**子依赖**（`ERR_PNPM_EXOTIC_SUBDEP`）。所以只有一处必须落在 registry：runtime 包，由作者发布到自己的 scope，再通过根 manifest 里的 `npm:` 别名映射回原包名。其余部分——宿主半、浏览器半、patch 层、构建产物——全部随 git 检出一起下发，因此 `lib/` 必须保持提交状态，用户本机不跑构建。
 
-发布 runtime 到 registry 是让该方法变得可用的唯一途径；在那之前，请使用上面的 tarball 流程。
+重建 / 重发 runtime：`node scripts/publish-runtime.mjs`（试跑）/ `--publish`。
+
+下面的 tarball 流程仍适用于离线机器。
 
 
-### 已发布包（`0.1.1`，面向 `0.1.x` Harness）
+### 上游已发布包（`0.1.1`，面向 `0.1.x` Harness）
 
-仅当你的 Profile 运行在 `dsh-v0.1.1-rc.2` 上时使用：
+> 注意：`dsh-context-compression-selector` 这个 npm 包名属于本仓库所修复的上游项目，`@latest` 装到的是上游构建，不是本仓库的修复版。只在你的 Profile 是 `dsh-v0.1.1-rc.2` 时才考虑使用，且不要与本仓库版本混装：
 
 ```sh
 dsh plugin --profile <profile> add dsh-context-compression-selector@latest
