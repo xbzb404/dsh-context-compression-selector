@@ -19,6 +19,7 @@
  * Usage:
  *   node scripts/publish-runtime.mjs            # stage only, prints what would be published
  *   node scripts/publish-runtime.mjs --publish  # stage + `pnpm publish`
+ *   node scripts/publish-runtime.mjs --publish --otp=123456   # non-interactive 2FA
  */
 
 import { execFileSync } from 'node:child_process'
@@ -33,6 +34,7 @@ const STAGE = join(ROOT, 'out/npm-runtime')
 const SCOPE = '@xbzb404'
 const ALIAS_KEY = 'dsh-context-compression-selector-runtime'
 const PUBLISH = process.argv.includes('--publish')
+const OTP = process.argv.find((arg) => arg.startsWith('--otp='))
 
 const readJson = async (path) => JSON.parse(await readFile(path, 'utf8'))
 
@@ -106,7 +108,15 @@ if (!PUBLISH) {
 }
 
 console.log(`\npublish-runtime: publishing ${publishedName}@${version} …`)
-execFileSync('pnpm', ['publish', '--access', 'public', '--tag', 'latest', '--no-git-checks'], {
+execFileSync('pnpm', [
+  'publish',
+  '--access',
+  'public',
+  '--tag',
+  'latest',
+  '--no-git-checks',
+  ...(OTP === void 0 ? [] : [OTP]),
+], {
   cwd: STAGE,
   stdio: 'inherit',
   shell: process.platform === 'win32',
