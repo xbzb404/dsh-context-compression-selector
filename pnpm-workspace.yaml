@@ -11,3 +11,6 @@ allowBuilds:
   esbuild: true
   koffi: true
   "@huggingface/tokenizers": true
+
+minimumReleaseAgeExclude:
+  - "@xbzb404/dsh-context-compression-selector-runtime@0.2.1-rc.3"
