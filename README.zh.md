@@ -106,7 +106,7 @@ set DSH_HOME=D:\dsh-home
 <details>
 <summary>为什么不用 <code>npm</code>/<code>pnpm</code> 或 <code>dsh</code> 命令安装？</summary>
 
-桌面版 Profile 由 Electron 应用自己管理，而本插件的 runtime 是未发布到 npm 的预发布包。任何包管理器执行都会在启动前重写 `node_modules`，而 Harness 会把每个客户端 bundle 的 `mtimeMs`/`ctimeMs`/`size` 哈希进它烘焙到页面里的模块图 revision——于是渲染进程请求到的是失效 URL，整个设置面板都会加载失败。在应用关闭时做纯文件复制可以同时避开这两个问题；完整说明见 [`release-package/README.md`](release-package/README.md)。
+桌面版 Profile 由 Electron 应用自己管理。任何包管理器执行都会在启动前重写 `node_modules`，而 Harness 会把每个客户端 bundle 的 `mtimeMs`/`ctimeMs`/`size` 哈希进它烘焙到页面里的模块图 revision——于是渲染进程请求到的是失效 URL，整个设置面板都会加载失败。在应用关闭时做纯文件复制可以避开这个问题，而且不需要 Node、npm 或任何账号；完整说明见 [`release-package/README.md`](release-package/README.md)。
 </details>
 
 
@@ -298,13 +298,15 @@ pnpm add --registry=https://registry.npmmirror.com file:<绝对路径>/release-a
 
 #### 为什么必须写 `overrides`
 
-选择器把 runtime 依赖声明为**精确版本**（`"dsh-context-compression-selector-runtime": "0.2.1-rc.5"`），而该 prerelease **未发布到 npm**。包管理器每次 `add` 都会重新解析整棵依赖树，于是：
+选择器把 runtime 依赖声明为**精确版本**（`"dsh-context-compression-selector-runtime": "0.2.1-rc.5"`）。包管理器每次 `add` 都会重新解析整棵依赖树，于是：
 
-- 只装选择器 tarball → 去 registry 找 `0.2.1-rc.5` → `ERR_PNPM_NO_MATCHING_VERSION`（registry 上只有不兼容的 `0.1.1`）；
-- **先装 runtime 再装选择器也无效** —— 第二步照样回 registry 解析那个精确版本，结果相同；
+- 只装选择器 tarball → 按**原名**去 registry 找 `0.2.1-rc.5`，而本 fork 发布的不是这个名字 → `ERR_PNPM_NO_MATCHING_VERSION`；
+- **先装 runtime 再装选择器也无效** —— 第二步照样回 registry 解析那个名字，结果相同；
 - 一次传入两个 tarball 也不行 —— pnpm 优先查 registry，不会采用同一命令行里的另一个 tarball。
 
-`overrides` 是唯一能在不发布的前提下把该依赖钉到本地的做法。它必须写在 profile 的 `pnpm-workspace.yaml` 里：**pnpm 11 已不再读取 `package.json` 的 `pnpm` 字段**（写在里面会打印警告并静默失效）。
+`overrides` 是把该依赖钉到本地文件的可行做法。它必须写在 profile 的 `pnpm-workspace.yaml` 里：**pnpm 11 已不再读取 `package.json` 的 `pnpm` 字段**（写在里面会打印警告并静默失效）。
+
+真正省事的路径是上面的 GitHub 安装：根 manifest 用 `npm:` 别名把这个名字映射到 `@xbzb404/dsh-context-compression-selector-runtime`，pnpm 会直接从 registry 解析，不需要写 override。
 
 > **注意**：`overrides` 里的路径是**本机绝对路径**，因此不随包分发 —— 每位用户都要按自己的解压位置改一次。
 

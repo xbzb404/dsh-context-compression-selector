@@ -33,10 +33,7 @@ Set `DSH_HOME` first if your Harness home is not `%USERPROFILE%\.dsh`.
 
 ## Why not pnpm
 
-The bundle's run-time (`dsh-context-compression-selector-runtime`) is a
-prerelease that is not on npm, so a plain `pnpm add` cannot resolve it. The
-usual workaround is a `pnpm` override pointing at a local tarball, but that
-still runs a package manager, which:
+A plain `pnpm add` still runs a package manager, which:
 
 * needs to delete its own temp tree first — blocked by many endpoint-protection
   agents and by the WorkBuddy sandbox (`SAFE_DELETE_BULK_CONFIRM_REQUIRED`);
@@ -50,8 +47,12 @@ stale: the browser requests them, gets a 404, and each `<script>` fires its
 `error` event — which the renderer reports as a bare **`failed to load`**, with
 the whole settings panel going blank.
 
-A copy from `vendor\` touches only the files it installs, and the app is closed
-while it runs, so the revision is stable by the time the next launch reads it.
+This package also exists for machines with no Node, no npm and no account: it
+installs from the files it ships, and touches only those files, while the app is
+closed — so the revision is stable by the time the next launch reads it.
+
+If you do have npm and just want the plugin without building anything, use the
+repository install instead (`dsh plugin add github:xbzb404/dsh-context-compression-selector`).
 
 ## What is in vendor/
 

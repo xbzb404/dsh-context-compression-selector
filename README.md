@@ -107,7 +107,7 @@ set DSH_HOME=D:\dsh-home
 <details>
 <summary>Why not <code>npm</code>/<code>pnpm</code> or the <code>dsh</code> CLI?</summary>
 
-The desktop profile is owned by the Electron application, and the plugin's runtime is a prerelease package that is not on npm. Any package-manager run rewrites `node_modules` right before launch, and Harness hashes each client bundle's `mtimeMs`/`ctimeMs`/`size` into the module-graph revision it bakes into the served page — so the renderer then requests stale URLs and the whole settings panel fails to load. A plain file copy, performed while the app is closed, avoids both problems. See [`release-package/README.md`](release-package/README.md) for the details.
+The desktop profile is owned by the Electron application. Any package-manager run rewrites `node_modules` right before launch, and Harness hashes each client bundle's `mtimeMs`/`ctimeMs`/`size` into the module-graph revision it bakes into the served page — so the renderer then requests stale URLs and the whole settings panel fails to load. A plain file copy, performed while the app is closed, avoids that, and it needs no Node, npm or account. See [`release-package/README.md`](release-package/README.md) for the details.
 </details>
 
 
@@ -322,13 +322,15 @@ pnpm add --registry=https://registry.npmmirror.com file:<abs-path>/release-artif
 
 #### Why the `overrides` entry is required
 
-The selector declares its runtime dependency as an **exact** version (`"dsh-context-compression-selector-runtime": "0.2.1-rc.5"`), and that prerelease is **not published to npm**. The package manager re-resolves the whole dependency tree on every `add`, so:
+The selector declares its runtime dependency as an **exact** version (`"dsh-context-compression-selector-runtime": "0.2.1-rc.5"`). The package manager re-resolves the whole dependency tree on every `add`, so:
 
-- installing only the selector tarball looks up `0.2.1-rc.5` in the registry → `ERR_PNPM_NO_MATCHING_VERSION` (the registry only has the incompatible `0.1.1`);
-- **installing the runtime first does not help** — the second `add` still re-resolves that exact version against the registry, with the same result;
+- installing only the selector tarball looks up `0.2.1-rc.5` under the **plain** name, which is not what this fork publishes → `ERR_PNPM_NO_MATCHING_VERSION`;
+- **installing the runtime first does not help** — the second `add` still re-resolves that exact name against the registry, with the same result;
 - passing both tarballs in one command does not work either — pnpm prefers the registry and will not adopt the sibling tarball from the same invocation.
 
-An `overrides` entry is the only supported way to pin the dependency locally without publishing. It must live in the profile's `pnpm-workspace.yaml`: **pnpm 11 no longer reads the `pnpm` field in `package.json`** and warns that it is ignored.
+An `overrides` entry is the way to pin the dependency to a local file. It must live in the profile's `pnpm-workspace.yaml`: **pnpm 11 no longer reads the `pnpm` field in `package.json`** and warns that it is ignored.
+
+The published-and-working path is the GitHub install above, where the root manifest maps that name onto `@xbzb404/dsh-context-compression-selector-runtime` with an `npm:` alias, so pnpm resolves it from the registry without an override.
 
 > **Note:** the path inside `overrides` is a host-absolute path, so it is not portable. Every user has to point it at their own extraction location.
 

@@ -14,6 +14,10 @@ All notable changes use this file. The project follows semantic versioning after
 - **The keyless parent/child cache-prefix E2E no longer compiles or runs against rc.5.** rc.5 replaced the `ctx.subagents.start(name, request)` seam with `startActivation(spec)`, where the provider, a task label, the request, cancellation, and a delivery policy arrive as separate fields, and the resolved `SubagentActivation` carries `childId` rather than `id` / `localAgent`. The spec now drives the activation surface and reads the live Agent from `ctx.agents.get(childId)` **before** awaiting `result`, because `SubagentActivation.result` settles only after teardown has released that residency.
 - **`SubagentRuntime` now injects `workingDirectory`, and local child startup calls `set(agent, path, signal)`.** A composition without the service exposes no `ctx.subagents` at all, and the agent-loop testkit fixture only implements `get`/`ensure`, so the spec mounts the fixture and adds the missing `set` instead of pulling in the real filesystem service.
 
+### Publishing
+
+- **`@xbzb404/dsh-context-compression-selector-runtime@0.2.1-rc.5` is now on the public npm registry**, so the `github:` install no longer depends on an unpublished exact version. The install docs drop the "runtime is not on npm" caveat that this release invalidates.
+
 ## Unreleased
 
 ### Fixed
