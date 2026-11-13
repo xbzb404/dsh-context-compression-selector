@@ -2,6 +2,18 @@
 
 All notable changes use this file. The project follows semantic versioning after `0.1.0`.
 
+## 0.2.1-rc.5 - 2026-11-12
+
+### Changed
+
+- **Re-targeted at DeepSeek Harness `0.2.1-rc.5`** (the runtime bundled in Desktop `0.2.1-rc.5`): every `@deepseek-ai` devDependency moves to `0.2.1-rc.5`, together with the cordis family the rc.5 packages peer on (`@deepseek-ai/cordis` 4.0.5, `cordis-plugin-include` 1.0.10, `cordis-plugin-loader` 1.0.6, `@deepseek-ai/schemastery` 3.18.5). `@deepseek-ai/dsh-invariants` stays at `0.2.0-rc.2`: it is still the newest published version (it otherwise ships only inside the Desktop bundle), and rc.5 does not change the `InvariantInstaller` shape this plugin uses.
+- **The published peer ranges now start at `0.2.1-rc.5`.** The previous floor (`>=0.2.0-rc.2`) was not merely cosmetic: pnpm resolves a peer range to the *lowest* satisfying version, so the workspace installed `@deepseek-ai/dsh-client-ui-slots@0.2.0-rc.2` alongside the root's `0.2.1-rc.5`. Two copies of that package means two `SlotMap` / `LocaleNamespaceMap` declaration-merge targets, and the client half stopped type-checking (`'settings.section' does not satisfy the constraint 'never'`, `'context-compression' is not assignable to 'keyof LocaleNamespaceMap'`) while still shipping a bundle. The floor now matches the version the plugin is built and tested against, and `scripts/verify-release.mjs` pins it so it cannot drift back silently.
+
+### Fixed
+
+- **The keyless parent/child cache-prefix E2E no longer compiles or runs against rc.5.** rc.5 replaced the `ctx.subagents.start(name, request)` seam with `startActivation(spec)`, where the provider, a task label, the request, cancellation, and a delivery policy arrive as separate fields, and the resolved `SubagentActivation` carries `childId` rather than `id` / `localAgent`. The spec now drives the activation surface and reads the live Agent from `ctx.agents.get(childId)` **before** awaiting `result`, because `SubagentActivation.result` settles only after teardown has released that residency.
+- **`SubagentRuntime` now injects `workingDirectory`, and local child startup calls `set(agent, path, signal)`.** A composition without the service exposes no `ctx.subagents` at all, and the agent-loop testkit fixture only implements `get`/`ensure`, so the spec mounts the fixture and adds the missing `set` instead of pulling in the real filesystem service.
+
 ## Unreleased
 
 ### Fixed

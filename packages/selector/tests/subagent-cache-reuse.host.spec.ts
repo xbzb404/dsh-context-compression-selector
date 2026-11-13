@@ -15,7 +15,7 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
 import type { Agent } from '@deepseek-ai/dsh-agent'
 import AgentLoop from '@deepseek-ai/dsh-agent-loop'
-import { mountAgentLoopTestDependencies } from '@deepseek-ai/dsh-agent-loop-testkit'
+import { mountAgentLoopTestDependencies, provideWorkingDirectoryFixture } from '@deepseek-ai/dsh-agent-loop-testkit'
 import { createUserMessage, type GenerateOptions } from '@deepseek-ai/dsh-llm'
 import * as LlmDeepSeek from '@deepseek-ai/dsh-llm-deepseek'
 import { SessionId, SessionLogOffset, type SessionEvent } from '@deepseek-ai/dsh-session'
@@ -72,6 +72,16 @@ async function harnessWith(
   await mountAgentLoopTestDependencies(created, {
     systemPrompt: { personaPrefix: SYSTEM, includeHarnessIdentity: false, includeRuntimeContext: false },
   })
+  // `SubagentRuntime` requires this service at rc.5 (`static inject`), and a
+  // composition without it exposes no `ctx.subagents` at all. The testkit
+  // fixture only implements `get`/`ensure`; rc.5's local-child startup also
+  // calls `set(agent, path, signal)`, so the fixture is extended here rather
+  // than mounting the real filesystem service.
+  provideWorkingDirectoryFixture(created, process.cwd())
+  const workingDirectory = created.get('workingDirectory') as {
+    set?: (agent: Agent, path: string, signal?: AbortSignal) => Promise<string>
+  }
+  workingDirectory.set ??= (_agent, path) => Promise.resolve(path)
   await created.plugin(TokenMeter)
   await created.plugin(AgentLoop, { agents: [] })
   await created.plugin(SubagentRuntime)
@@ -132,14 +142,22 @@ describe('parent/child prefix behavior (keyless full-loop E2E)', () => {
     const parentRequest = requests.get(String(parent.id))?.at(-1)
     expect(parentRequest).toBeDefined()
 
-    const forkRun = await ctx.subagents.start('fork', {
-      prompt: [{ type: 'text', text: CHILD_TEXT }],
-      parent,
+    const forkRun = await ctx.subagents.startActivation({
+      provider: 'fork',
+      label: 'cache-fork',
+      request: {
+        prompt: [{ type: 'text', text: CHILD_TEXT }],
+        parent,
+      },
       signal: new AbortController().signal,
+      delivery: 'caller',
     })
+    // rc.5 resolves an Activation, not the old run handle: the live Agent is
+    // read from the registry while the activation holds it, because `result`
+    // settles only after teardown has released that residency.
+    const forkChild = ctx.agents.get(forkRun.childId)
     await forkRun.result
-    const forkChild = forkRun.localAgent
-    const forkRequest = requests.get(String(forkRun.id))?.at(-1)
+    const forkRequest = requests.get(String(forkRun.childId))?.at(-1)
     expect(forkChild).toBeDefined()
     expect(forkRequest).toBeDefined()
     if (forkChild === undefined || forkRequest === undefined || parentRequest === undefined) {
@@ -152,14 +170,19 @@ describe('parent/child prefix behavior (keyless full-loop E2E)', () => {
     expect(fingerprintStablePrefix(forkStablePrefix)).toBe(fingerprintStablePrefix(parentStable))
     expect(Object.isFrozen(forkRequest)).toBe(true)
 
-    const spawnRun = await ctx.subagents.start('spawn', {
-      prompt: [{ type: 'text', text: SPAWN_TEXT }],
-      parent,
+    const spawnRun = await ctx.subagents.startActivation({
+      provider: 'spawn',
+      label: 'cache-spawn',
+      request: {
+        prompt: [{ type: 'text', text: SPAWN_TEXT }],
+        parent,
+      },
       signal: new AbortController().signal,
+      delivery: 'caller',
     })
+    const spawnChild = ctx.agents.get(spawnRun.childId)
     await spawnRun.result
-    const spawnChild = spawnRun.localAgent
-    const spawnRequest = requests.get(String(spawnRun.id))?.at(-1)
+    const spawnRequest = requests.get(String(spawnRun.childId))?.at(-1)
     expect(spawnChild?.session.inheritedEventCount).toBe(0)
     expect(spawnRequest).toBeDefined()
     expect(JSON.stringify(spawnRequest?.messages)).not.toContain(PARENT_TEXT)
@@ -197,16 +220,21 @@ describe.skipIf(!process.env.DEEPSEEK_API_KEY)('parent/child natural cache-prefi
     const parentRequest = requests.get(String(parent.id))?.at(-1)
     expect(parentRequest).toBeDefined()
 
-    const forkRun = await ctx.subagents.start('fork', {
-      prompt: [{ type: 'text', text: CHILD_TEXT }],
-      parent,
+    const forkRun = await ctx.subagents.startActivation({
+      provider: 'fork',
+      label: 'cache-fork-live',
+      request: {
+        prompt: [{ type: 'text', text: CHILD_TEXT }],
+        parent,
+      },
       signal: new AbortController().signal,
+      delivery: 'caller',
     })
+    const forkChild = ctx.agents.get(forkRun.childId)
     await forkRun.result
-    const forkChild = forkRun.localAgent
     expect(forkChild).toBeDefined()
     if (forkChild === undefined) throw new Error('fork did not publish a local agent')
-    const forkRequest = requests.get(String(forkRun.id))?.at(-1)
+    const forkRequest = requests.get(String(forkRun.childId))?.at(-1)
     expect(forkRequest).toBeDefined()
     expect(forkChild.session.header).toMatchObject({
       parentSession: parent.session.header.id,
@@ -250,16 +278,21 @@ describe.skipIf(!process.env.DEEPSEEK_API_KEY)('parent/child natural cache-prefi
     expect(JSON.stringify(record)).not.toContain(CHILD_TEXT)
     console.info(`SUBAGENT_CACHE_E2E ${JSON.stringify(record)}`)
 
-    const spawnRun = await ctx.subagents.start('spawn', {
-      prompt: [{ type: 'text', text: SPAWN_TEXT }],
-      parent,
+    const spawnRun = await ctx.subagents.startActivation({
+      provider: 'spawn',
+      label: 'cache-spawn-live',
+      request: {
+        prompt: [{ type: 'text', text: SPAWN_TEXT }],
+        parent,
+      },
       signal: new AbortController().signal,
+      delivery: 'caller',
     })
+    const spawnChild = ctx.agents.get(spawnRun.childId)
     await spawnRun.result
-    const spawnChild = spawnRun.localAgent
     expect(spawnChild).toBeDefined()
     if (spawnChild === undefined) throw new Error('spawn did not publish a local agent')
-    const spawnRequest = requests.get(String(spawnRun.id))?.at(-1)
+    const spawnRequest = requests.get(String(spawnRun.childId))?.at(-1)
     expect(spawnChild.session.header.parentSession).toBe(parent.session.header.id)
     expect(spawnChild.session.inheritedEventCount).toBe(0)
     expect(spawnRequest).toBeDefined()

@@ -13,4 +13,4 @@ allowBuilds:
   "@huggingface/tokenizers": true
 
 minimumReleaseAgeExclude:
-  - "@xbzb404/dsh-context-compression-selector-runtime@0.2.1-rc.3"
+  - "@xbzb404/dsh-context-compression-selector-runtime@0.2.1-rc.5"
