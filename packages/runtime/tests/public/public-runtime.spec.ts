@@ -30,6 +30,10 @@ import SystemPrompt from '@deepseek-ai/dsh-system-prompt'
 import TokenMeter from '@deepseek-ai/dsh-token-meter'
 import SessionProjectionRegistry from '@deepseek-ai/dsh-session-projection'
 import ToolRuntime from '@deepseek-ai/dsh-tools'
+// 0.2.2 split tool *execution* out into its own plugin: ToolsService alone no
+// longer answers `execute()`, it needs a selected executor in the same scope.
+// The package has no default export — it publishes a plain cordis plugin object.
+import * as NativeToolExecutorPlugin from '@deepseek-ai/dsh-tool-executor-native'
 import { CompactionId } from '@deepseek-ai/dsh-compaction'
 import InvariantRegistry from '@deepseek-ai/dsh-invariants'
 import * as SelectorHost from '../../../selector/src/index.ts'
@@ -307,6 +311,12 @@ function stubAgent(ctx: Context, session: Session): Agent {
     id: session.id,
     options: {},
     session,
+    // 0.2.2 gave the Agent its own durable model accessor; the compression code
+    // under test never reads it, so the stub only needs the shape.
+    model: {
+      current: () => undefined,
+      select: () => {},
+    },
     inbox: {
       nextTurn: [],
       nextStep: [],
@@ -1816,6 +1826,7 @@ describe('standalone runtime on published Harness APIs', () => {
     await ctx.plugin(SessionStore)
     await ctx.plugin(SystemPrompt)
     await ctx.plugin(ToolRuntime)
+    await ctx.plugin(NativeToolExecutorPlugin)
     await ctx.plugin(SessionProjectionRegistry)
     await ctx.plugin(TokenMeter)
     const audit = captureAudit(ctx)
@@ -1867,15 +1878,19 @@ describe('standalone runtime on published Harness APIs', () => {
       tokensAfter: expect.any(Number),
     }))
 
-    const recovered = await ctx.tools.execute({
-      name: 'context_compression_retrieve',
-      arguments: { ref: publication?.ref, max_lines: 20 },
-      callId: ToolCallId('tailtrim-retrieve-live'),
+    const recoveredBatch = await ctx.tools.execute({
+      calls: [{
+        type: 'tool-call',
+        id: ToolCallId('tailtrim-retrieve-live'),
+        name: 'context_compression_retrieve',
+        arguments: JSON.stringify({ ref: publication?.ref, max_lines: 20 }),
+      }],
       signal: new AbortController().signal,
       agent: stubAgent(ctx, session),
     })
-    expect(recovered.isError).toBe(false)
-    const recoveredText = recovered.content
+    const recovered = recoveredBatch.results[0]?.result
+    expect(recovered?.isError).toBe(false)
+    const recoveredText = recovered?.content
       .map(block => block.type === 'text' ? block.text : '')
       .join('\n')
     expect(recoveredText).toContain('kind: tailtrim-group')
@@ -1886,14 +1901,17 @@ describe('standalone runtime on published Harness APIs', () => {
     const replayPublication = validatePublishedTailTrim(replay, manifest.seq)
     expect(replayPublication?.ref).toBe(publication?.ref)
     expect(replay.deriveMessages()).toEqual(session.deriveMessages())
-    const replayRecovered = await ctx.tools.execute({
-      name: 'context_compression_retrieve',
-      arguments: { ref: replayPublication?.ref, max_lines: 20 },
-      callId: ToolCallId('tailtrim-retrieve-replay'),
+    const replayBatch = await ctx.tools.execute({
+      calls: [{
+        type: 'tool-call',
+        id: ToolCallId('tailtrim-retrieve-replay'),
+        name: 'context_compression_retrieve',
+        arguments: JSON.stringify({ ref: replayPublication?.ref, max_lines: 20 }),
+      }],
       signal: new AbortController().signal,
       agent: stubAgent(ctx, replay),
     })
-    expect(replayRecovered).toEqual(recovered)
+    expect(replayBatch.results[0]?.result).toEqual(recovered)
   })
 
   it('audits TailTrim threshold, tokenizer, safety-group, and min-reclaim skip paths', async () => {
@@ -2250,7 +2268,7 @@ describe('standalone runtime on published Harness APIs', () => {
     const signal = new AbortController().signal
     const decision = await agentEvents(ctx, stubAgent(ctx, session)).waterfall(
       'agent/pre-step',
-      { messages: [], turn: 5, step: 1, signal },
+      { messages: [], turn: 5, step: 1, signal, modelSelection: { provider: 'deepseek', model: MODEL } },
       () => Promise.resolve({ kind: 'enter' as const, messages: [] }),
     )
     expect(decision).toEqual({ kind: 'enter', messages: [] })

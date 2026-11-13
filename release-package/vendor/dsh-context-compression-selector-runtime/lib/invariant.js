@@ -1,5 +1,5 @@
 import { a as validatePublishedTailTrim, o as sessionEvents } from "./tail-trim.js";
-//#region src/invariant.ts
+// src/invariant.ts
 const PACKAGE_NAME = "dsh-context-compression-selector-runtime";
 /** Cordis companion plugin name. */
 const name = "context-compression-selector-runtime-invariant";
@@ -66,5 +66,4 @@ const install = Object.assign((ctx, fail) => {
 }, { inject: ["sessions"] });
 /** Register this package's invariant companion. */
 const apply = (ctx) => Promise.resolve(ctx.invariants.register(PACKAGE_NAME, install));
-//#endregion
 export { apply, inject, name };

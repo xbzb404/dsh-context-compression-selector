@@ -1,5 +1,5 @@
 import { createUserMessage } from "@deepseek-ai/dsh-llm";
-//#region src/session-events.ts
+// src/session-events.ts
 /**
 * Read one immutable Session event snapshot.
 *
@@ -15,8 +15,7 @@ function sessionEvents(session) {
 	if (candidate.events !== void 0) return candidate.events;
 	throw new TypeError("Session exposes neither snapshotEvents() nor the rc.2 events accessor");
 }
-//#endregion
-//#region src/tail-trim.ts
+// src/tail-trim.ts
 /** Plugin-owned TailTrim publication protocol over official Session events. */
 const PRUNE_SOURCE_PLUGIN = "dsh-context-compression-selector-runtime";
 const TAIL_TRIM_REF_PATTERN = /^session:\/\/([^/]+)\/tailtrim\/(\d+)$/;
@@ -138,5 +137,4 @@ function validRootGroup(roots, manifestSeq) {
 function sameNumbers(left, right) {
 	return left !== void 0 && left.length === right.length && left.every((value, index) => value === right[index]);
 }
-//#endregion
 export { validatePublishedTailTrim as a, tailTrimStub as i, tailTrimMessage as n, sessionEvents as o, tailTrimRef as r, parseTailTrimRef as t };

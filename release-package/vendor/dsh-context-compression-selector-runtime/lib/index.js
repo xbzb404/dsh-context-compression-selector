@@ -7,7 +7,7 @@ import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { Tokenizer } from "@huggingface/tokenizers";
 import { defineTool } from "@deepseek-ai/dsh-tools";
-//#region src/deepseek-v4-tokenizer.ts
+// src/deepseek-v4-tokenizer.ts
 /** Offline DeepSeek tokenizers backed by pinned official Hugging Face assets. */
 const TOKENIZER_ID = "deepseek-ai/DeepSeek-V4-Pro";
 const TOKENIZER_REVISION = "0e1a0e5e52aea73055f50fef6f2423db370265b6";
@@ -139,8 +139,7 @@ function readVerifiedJson(assetRoot, name, descriptor) {
 	if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) throw new Error(`DeepSeek tokenizer asset ${name} must contain a JSON object`);
 	return parsed;
 }
-//#endregion
-//#region src/deepseek-route.ts
+// src/deepseek-route.ts
 /**
 * Provider-route identity for the DeepSeek surfaces this runtime may measure.
 *
@@ -198,8 +197,7 @@ const DEEPSEEK_OFFICIAL_BASE_URL_CLASSES = Object.freeze(["official-public", "ac
 function isDeepSeekOfficialBaseUrlClass(baseUrlClass) {
 	return DEEPSEEK_OFFICIAL_BASE_URL_CLASSES.includes(baseUrlClass);
 }
-//#endregion
-//#region src/deepseek-v4-vision-tokens.ts
+// src/deepseek-v4-vision-tokens.ts
 /**
 * Exact DeepSeek V4.1-Flash image-token arithmetic.
 *
@@ -396,8 +394,7 @@ function safeResize(height, width, initialBestHeight, initialBestWidth, patch, d
 		bestWidth
 	};
 }
-//#endregion
-//#region src/token-count.ts
+// src/token-count.ts
 /** Build an explicit unavailable result without inventing an estimate. */
 function unavailableTokenCount(reason) {
 	if (reason.length === 0) throw new TypeError("unavailable token count requires a reason");
@@ -426,8 +423,7 @@ function countExactCanonicalTextFields(fields, counter, subject) {
 		tokens
 	});
 }
-//#endregion
-//#region src/measurement.ts
+// src/measurement.ts
 /**
 * Every model id served by the V4.1-Flash artifact carries the vision image
 * counter. Membership is a set test, never a positional `modelIds[0]` read, so
@@ -997,8 +993,7 @@ function codePointLength$1(text) {
 	for (const _point of text) count++;
 	return count;
 }
-//#endregion
-//#region src/types.ts
+// src/types.ts
 /** User-facing mixed strategy profile. */
 const COMPRESSION_PROFILES = [
 	"off",
@@ -1009,8 +1004,7 @@ const COMPRESSION_PROFILES = [
 	"adaptive",
 	"custom"
 ];
-//#endregion
-//#region src/value.ts
+// src/value.ts
 /** Version-neutral immutable-value and closed-union helpers for the plugin runtime. */
 /**
 * Freeze an object graph in place without relying on a Harness utility export.
@@ -1063,8 +1057,7 @@ function assertNever(value, context) {
 	const rendered = JSON.stringify(value) ?? String(value);
 	throw new Error(`unreachable variant${context === void 0 ? "" : ` in ${context}`}: ${rendered}`);
 }
-//#endregion
-//#region src/custom-policy.ts
+// src/custom-policy.ts
 /** Strict versioned Custom policy parsing and effective-token resolution. */
 const budgetSchema = z.object({
 	enabled: z.boolean().required(),
@@ -1322,8 +1315,7 @@ function assertEffectiveRelations(policy) {
 	if (policy.aggregateTargetTokens >= policy.aggregateTriggerTokens) throw new Error("Custom effective Aggregate target must be below trigger");
 	if (policy.historyMinReclaimTokens > policy.historyTriggerTokens) throw new Error("Custom effective History min-reclaim must not exceed its trigger");
 }
-//#endregion
-//#region src/config.ts
+// src/config.ts
 /** Configuration resolution for the mixed deterministic context-compression selector. */
 /** Settings namespace shared by the Host service and browser selector. */
 const CONTEXT_COMPRESSION_SETTINGS_NAMESPACE = "context-compression";
@@ -1729,8 +1721,7 @@ function assertPositiveInteger(name, value) {
 function assertNonNegativeInteger(name, value) {
 	if (!Number.isSafeInteger(value) || value < 0) throw new Error(`ToolResultPruneConfig: ${name} (${String(value)}) must be a non-negative safe integer`);
 }
-//#endregion
-//#region src/reducers.ts
+// src/reducers.ts
 /** Deterministic, evidence-backed reducers for fresh tool results. */
 const ANSI_PATTERN = /\u001B(?:\[[0-?]*[ -/]*[@-~]|\][^\u0007]*(?:\u0007|\u001B\\))/gu;
 const IMPORTANT_PATTERN = new RegExp([
@@ -2148,8 +2139,7 @@ function buildPattern() {
 		String.raw`\d+\s+Warning\(s\)|Finished\s+test|compilation failed)`
 	].join(""), "i");
 }
-//#endregion
-//#region src/deepseek-official-pricing.ts
+// src/deepseek-official-pricing.ts
 /** Checked-in DeepSeek official prices and fixed-point provider-usage accounting. */
 const DEEPSEEK_OFFICIAL_PRICE_CATALOG_VERSION = "deepseek-official-2026-09-23";
 /**
@@ -2398,8 +2388,7 @@ function unpriced(reason) {
 		reason
 	};
 }
-//#endregion
-//#region src/adaptive-cost.ts
+// src/adaptive-cost.ts
 /**
 * Bound Adaptive's benefit and cache-loss exposure without attributing the
 * request-level cache split to individual messages. Removed tokens are not
@@ -2500,8 +2489,7 @@ function unknown(reason) {
 function isCount(value) {
 	return Number.isSafeInteger(value) && value >= 0;
 }
-//#endregion
-//#region src/audit.ts
+// src/audit.ts
 /** Stable prefix used to locate one JSON audit record in Harness runtime logs. */
 const COMPRESSION_AUDIT_PREFIX = "context-compression audit ";
 /**
@@ -2522,8 +2510,7 @@ function emitCompressionAudit(logger, record) {
 		logger.info(formatCompressionAudit(record));
 	} catch {}
 }
-//#endregion
-//#region src/index.ts
+// src/index.ts
 /**
 * Replay-safe, model-free context-compression selector for tool results.
 *
@@ -3867,5 +3854,4 @@ function emptyResult() {
 		tokensRemoved: 0
 	};
 }
-//#endregion
 export { AUTO_COMPACT_THRESHOLD_LIMITS, COMPRESSION_PROFILES, CONTEXT_COMPRESSION_SETTINGS_NAMESPACE, ContextCompressionSettingsSchema, CustomCompressionPolicyInputSchema, CustomCompressionPolicySchema, DEFAULTS, DEFAULT_CUSTOM_COMPRESSION_POLICY, PRUNE_MARKER, ToolResultPruner, ToolResultPruner as default, codePointLength, historicalPlaceholder, isCompressionProfile, isValidAutoCompactThresholdPercent, measureForCompaction, normalizeTerminalText, parseContextCompressionSettings, reduceFreshToolResult, resolveConfig, resolveCustomPolicy, resolvePolicy, verifyReduction };

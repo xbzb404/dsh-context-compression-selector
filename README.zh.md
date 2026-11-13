@@ -1,255 +1,184 @@
 # dsh-context-compression-selector
 
-> 面向 DeepSeek Harness 的、可审计的工具结果上下文压缩选择器。
+> 闈㈠悜 DeepSeek Harness 鐨勩€佸彲瀹¤鐨勫伐鍏风粨鏋滀笂涓嬫枃鍘嬬缉閫夋嫨鍣ㄣ€?
+Compatible with: dsh `0.2.2-rc.1`锛堥€傞厤 `0.2.x`锛屽凡鍦?DeepSeek Harness 妗岄潰绔?`0.2.2-rc.1` 瀹炴祴锛夈€?
+[English README](README.md) 路 [鎻愪氦闂](https://github.com/xbzb404/dsh-context-compression-selector/issues)
 
-Compatible with: dsh `0.2.1-rc.5`（适配 `0.2.x`，已在 DeepSeek Harness 桌面端 `0.2.1-rc.5` 实测）。
+## 瀹夎
 
-[English README](README.md) · [提交问题](https://github.com/xbzb404/dsh-context-compression-selector/issues)
-
-## 安装
-
-一条命令，直接从本仓库安装：
-
+涓€鏉″懡浠わ紝鐩存帴浠庢湰浠撳簱瀹夎锛?
 ```sh
 dsh plugin add github:xbzb404/dsh-context-compression-selector
-dsh --dump-config   # 能看到 selector 这一层即为装好
-```
+dsh --dump-config   # 鑳界湅鍒?selector 杩欎竴灞傚嵆涓鸿濂?```
 
-`dsh plugin add` 会把本仓库根目录当作 Bundle：里面已带编译好的
-`packages/selector/lib`、`cordis.patch.yml` 层与浏览器端代码，本机不需要构建。
-内部运行时包（`dsh-context-compression-selector-runtime`）是唯一走 registry 的一环
-——pnpm 不允许 git 子依赖——安装时会自动解析。
-
-升级 / 卸载：
-
+`dsh plugin add` 浼氭妸鏈粨搴撴牴鐩綍褰撲綔 Bundle锛氶噷闈㈠凡甯︾紪璇戝ソ鐨?`packages/selector/lib`銆乣cordis.patch.yml` 灞備笌娴忚鍣ㄧ浠ｇ爜锛屾湰鏈轰笉闇€瑕佹瀯寤恒€?鍐呴儴杩愯鏃跺寘锛坄dsh-context-compression-selector-runtime`锛夋槸鍞竴璧?registry 鐨勪竴鐜?鈥斺€攑npm 涓嶅厑璁?git 瀛愪緷璧栤€斺€斿畨瑁呮椂浼氳嚜鍔ㄨВ鏋愩€?
+鍗囩骇 / 鍗歌浇锛?
 ```sh
 dsh plugin up dsh-context-compression-selector
 dsh plugin remove dsh-context-compression-selector
 ```
 
-不想敲命令（Windows、无需 Node/npm/账号）请看下面的离线安装。
-
-## 安装（Windows 10/11，无需 Node / npm / 账号）
-
-**最省事的办法：下载 → 解压 → 双击。** 四步，不用敲任何命令。
-
-1. 在本页点绿色的 **`Code`** 按钮 → **`Download ZIP`**
-   （直接下载链接：<https://github.com/xbzb404/dsh-context-compression-selector/archive/refs/heads/main.zip>）。
-2. 把 zip 解压到任意目录，例如 `D:\dsh-ctx`（右键 →「全部解压缩」）。
-3. **完全退出 DeepSeek Harness —— 连托盘图标也要退出**（右键托盘图标 → 退出）。
-4. 双击这个文件：
-
+涓嶆兂鏁插懡浠わ紙Windows銆佹棤闇€ Node/npm/璐﹀彿锛夎鐪嬩笅闈㈢殑绂荤嚎瀹夎銆?
+## 瀹夎锛圵indows 10/11锛屾棤闇€ Node / npm / 璐﹀彿锛?
+**鏈€鐪佷簨鐨勫姙娉曪細涓嬭浇 鈫?瑙ｅ帇 鈫?鍙屽嚮銆?* 鍥涙锛屼笉鐢ㄦ暡浠讳綍鍛戒护銆?
+1. 鍦ㄦ湰椤电偣缁胯壊鐨?**`Code`** 鎸夐挳 鈫?**`Download ZIP`**
+   锛堢洿鎺ヤ笅杞介摼鎺ワ細<https://github.com/xbzb404/dsh-context-compression-selector/archive/refs/heads/main.zip>锛夈€?2. 鎶?zip 瑙ｅ帇鍒颁换鎰忕洰褰曪紝渚嬪 `D:\dsh-ctx`锛堝彸閿?鈫掋€屽叏閮ㄨВ鍘嬬缉銆嶏級銆?3. **瀹屽叏閫€鍑?DeepSeek Harness 鈥斺€?杩炴墭鐩樺浘鏍囦篃瑕侀€€鍑?*锛堝彸閿墭鐩樺浘鏍?鈫?閫€鍑猴級銆?4. 鍙屽嚮杩欎釜鏂囦欢锛?
    ```
    D:\dsh-ctx\dsh-context-compression-selector-main\release-package\install.cmd
    ```
 
-   如果弹出蓝色的「Windows 已保护你的电脑」提示，点 **更多信息** → **仍要运行**。这个脚本只是往你自己的 Harness 配置目录里复制文件：不联网下载、不调用 npm/pnpm、也不需要注册或登录任何账号。
-
-5. 看到 `=== done ===` 之后，重新启动 DeepSeek Harness。
-
-安装脚本会自动完成这些事：
-
-| 步骤 | 做什么 |
+   濡傛灉寮瑰嚭钃濊壊鐨勩€學indows 宸蹭繚鎶や綘鐨勭數鑴戙€嶆彁绀猴紝鐐?**鏇村淇℃伅** 鈫?**浠嶈杩愯**銆傝繖涓剼鏈彧鏄線浣犺嚜宸辩殑 Harness 閰嶇疆鐩綍閲屽鍒舵枃浠讹細涓嶈仈缃戜笅杞姐€佷笉璋冪敤 npm/pnpm銆佷篃涓嶉渶瑕佹敞鍐屾垨鐧诲綍浠讳綍璐﹀彿銆?
+5. 鐪嬪埌 `=== done ===` 涔嬪悗锛岄噸鏂板惎鍔?DeepSeek Harness銆?
+瀹夎鑴氭湰浼氳嚜鍔ㄥ畬鎴愯繖浜涗簨锛?
+| 姝ラ | 鍋氫粈涔?|
 |---|---|
-| 1 | 备份 `%USERPROFILE%\.dsh\profiles\desktop\package.json` |
-| 2 | 把它 `vendor\` 里的 6 个包复制到 `…\profiles\desktop\node_modules\` |
-| 3 | 把 `dsh-context-compression-selector` 注册进该 Profile 的 `dsh.profile.bundles` |
-| 4 | 逐项检查入口文件是否到位，缺什么就直接告诉你 |
+| 1 | 澶囦唤 `%USERPROFILE%\.dsh\profiles\desktop\package.json` |
+| 2 | 鎶婂畠 `vendor\` 閲岀殑 6 涓寘澶嶅埗鍒?`鈥profiles\desktop\node_modules\` |
+| 3 | 鎶?`dsh-context-compression-selector` 娉ㄥ唽杩涜 Profile 鐨?`dsh.profile.bundles` |
+| 4 | 閫愰」妫€鏌ュ叆鍙ｆ枃浠舵槸鍚﹀埌浣嶏紝缂轰粈涔堝氨鐩存帴鍛婅瘔浣?|
 
-然后打开 **设置 → Context compression**，Profile 选 **Balanced**，新会话请选用 `standard--compression` 预设（详见[模式说明](#profile-一览)）。
-
-### 同样的安装，用命令完成
-
-按 `Win + R`，输入 `cmd` 回车打开**命令提示符**，一行一行粘贴执行。
-
+鐒跺悗鎵撳紑 **璁剧疆 鈫?Context compression**锛孭rofile 閫?**Balanced**锛屾柊浼氳瘽璇烽€夌敤 `standard--compression` 棰勮锛堣瑙乕妯″紡璇存槑](#profile-涓€瑙?锛夈€?
+### 鍚屾牱鐨勫畨瑁咃紝鐢ㄥ懡浠ゅ畬鎴?
+鎸?`Win + R`锛岃緭鍏?`cmd` 鍥炶溅鎵撳紑**鍛戒护鎻愮ず绗?*锛屼竴琛屼竴琛岀矘璐存墽琛屻€?
 ```cmd
-:: 1. 下载本仓库的 zip
+:: 1. 涓嬭浇鏈粨搴撶殑 zip
 powershell -NoProfile -Command "[Net.ServicePointManager]::SecurityProtocol='Tls12'; Invoke-WebRequest -Uri 'https://github.com/xbzb404/dsh-context-compression-selector/archive/refs/heads/main.zip' -OutFile '%USERPROFILE%\Downloads\dsh-ctx.zip'"
 
-:: 2. 解压
+:: 2. 瑙ｅ帇
 powershell -NoProfile -Command "Expand-Archive -Path '%USERPROFILE%\Downloads\dsh-ctx.zip' -DestinationPath '%USERPROFILE%\Downloads\dsh-ctx' -Force"
 
-:: 3. 先完全退出 DeepSeek Harness（含托盘图标），再安装
-"%USERPROFILE%\Downloads\dsh-ctx\dsh-context-compression-selector-main\release-package\install.cmd"
+:: 3. 鍏堝畬鍏ㄩ€€鍑?DeepSeek Harness锛堝惈鎵樼洏鍥炬爣锛夛紝鍐嶅畨瑁?"%USERPROFILE%\Downloads\dsh-ctx\dsh-context-compression-selector-main\release-package\install.cmd"
 ```
 
-已经装了 `git` 的话，两行就够：
+宸茬粡瑁呬簡 `git` 鐨勮瘽锛屼袱琛屽氨澶燂細
 
 ```cmd
 git clone https://github.com/xbzb404/dsh-context-compression-selector.git
 dsh-context-compression-selector\release-package\install.cmd
 ```
 
-装到别的 Profile、或 Harness 家目录不在默认位置：
+瑁呭埌鍒殑 Profile銆佹垨 Harness 瀹剁洰褰曚笉鍦ㄩ粯璁や綅缃細
 
 ```cmd
-:: 装到 desktop 以外的 Profile
+:: 瑁呭埌 desktop 浠ュ鐨?Profile
 ...\release-package\install.cmd myprofile
 
-:: Harness 家目录不是 %USERPROFILE%\.dsh
+:: Harness 瀹剁洰褰曚笉鏄?%USERPROFILE%\.dsh
 set DSH_HOME=D:\dsh-home
 ...\release-package\install.cmd
 
-:: 查看内置帮助
+:: 鏌ョ湅鍐呯疆甯姪
 ...\release-package\install.cmd --help
 ```
 
-### 出问题了怎么办
-
-| 你看到的 | 怎么处理 |
+### 鍑洪棶棰樹簡鎬庝箞鍔?
+| 浣犵湅鍒扮殑 | 鎬庝箞澶勭悊 |
 |---|---|
-| `[X] DeepSeek Harness is running.` | 没退干净。连托盘图标一起退出后重新运行脚本。 |
-| `[X] no Harness profile at …` | 先启动一次 DeepSeek Harness 让它生成 Profile，退出后再运行脚本。 |
-| 想恢复原状 | 脚本会打印备份路径，例如 `copy /Y "…\package.json.bak-install-12345" "…\package.json"`；随后从 `…\profiles\desktop\node_modules` 里删掉 `dsh-context-compression-selector`、`dsh-context-compression-selector-runtime`、`js-yaml`、`@huggingface`、`@deepseek-ai\dsh-compaction-basic`、`@deepseek-ai\dsh-command-compact` 六个文件夹即可。 |
-| 设置里没出现新东西 | Host 半边在启动时加载，请重启应用；另外该会话必须选用 `--compression` 预设才会真正压缩。 |
+| `[X] DeepSeek Harness is running.` | 娌￠€€骞插噣銆傝繛鎵樼洏鍥炬爣涓€璧烽€€鍑哄悗閲嶆柊杩愯鑴氭湰銆?|
+| `[X] no Harness profile at 鈥 | 鍏堝惎鍔ㄤ竴娆?DeepSeek Harness 璁╁畠鐢熸垚 Profile锛岄€€鍑哄悗鍐嶈繍琛岃剼鏈€?|
+| 鎯虫仮澶嶅師鐘?| 鑴氭湰浼氭墦鍗板浠借矾寰勶紝渚嬪 `copy /Y "鈥package.json.bak-install-12345" "鈥package.json"`锛涢殢鍚庝粠 `鈥profiles\desktop\node_modules` 閲屽垹鎺?`dsh-context-compression-selector`銆乣dsh-context-compression-selector-runtime`銆乣js-yaml`銆乣@huggingface`銆乣@deepseek-ai\dsh-compaction-basic`銆乣@deepseek-ai\dsh-command-compact` 鍏釜鏂囦欢澶瑰嵆鍙€?|
+| 璁剧疆閲屾病鍑虹幇鏂颁笢瑗?| Host 鍗婅竟鍦ㄥ惎鍔ㄦ椂鍔犺浇锛岃閲嶅惎搴旂敤锛涘彟澶栬浼氳瘽蹇呴』閫夌敤 `--compression` 棰勮鎵嶄細鐪熸鍘嬬缉銆?|
 
 <details>
-<summary>为什么不用 <code>npm</code>/<code>pnpm</code> 或 <code>dsh</code> 命令安装？</summary>
+<summary>涓轰粈涔堜笉鐢?<code>npm</code>/<code>pnpm</code> 鎴?<code>dsh</code> 鍛戒护瀹夎锛?/summary>
 
-桌面版 Profile 由 Electron 应用自己管理。任何包管理器执行都会在启动前重写 `node_modules`，而 Harness 会把每个客户端 bundle 的 `mtimeMs`/`ctimeMs`/`size` 哈希进它烘焙到页面里的模块图 revision——于是渲染进程请求到的是失效 URL，整个设置面板都会加载失败。在应用关闭时做纯文件复制可以避开这个问题，而且不需要 Node、npm 或任何账号；完整说明见 [`release-package/README.md`](release-package/README.md)。
-</details>
+妗岄潰鐗?Profile 鐢?Electron 搴旂敤鑷繁绠＄悊銆備换浣曞寘绠＄悊鍣ㄦ墽琛岄兘浼氬湪鍚姩鍓嶉噸鍐?`node_modules`锛岃€?Harness 浼氭妸姣忎釜瀹㈡埛绔?bundle 鐨?`mtimeMs`/`ctimeMs`/`size` 鍝堝笇杩涘畠鐑樼剻鍒伴〉闈㈤噷鐨勬ā鍧楀浘 revision鈥斺€斾簬鏄覆鏌撹繘绋嬭姹傚埌鐨勬槸澶辨晥 URL锛屾暣涓缃潰鏉块兘浼氬姞杞藉け璐ャ€傚湪搴旂敤鍏抽棴鏃跺仛绾枃浠跺鍒跺彲浠ラ伩寮€杩欎釜闂锛岃€屼笖涓嶉渶瑕?Node銆乶pm 鎴栦换浣曡处鍙凤紱瀹屾暣璇存槑瑙?[`release-package/README.md`](release-package/README.md)銆?</details>
 
-
-> [!NOTE]
-> **本仓库是个人 fork**，派生自原 `dsh-context-compression-selector` 项目，
-> 现作为个人仓库独立维护。原项目的设计、实现与配套课件均为上游作者的工作；
-> MIT 许可证及其条款原样沿用。
 
 > [!NOTE]
-> **0.2.0-rc.1 更新内容：**
+> **鏈粨搴撴槸涓汉 fork**锛屾淳鐢熻嚜鍘?`dsh-context-compression-selector` 椤圭洰锛?> 鐜颁綔涓轰釜浜轰粨搴撶嫭绔嬬淮鎶ゃ€傚師椤圭洰鐨勮璁°€佸疄鐜颁笌閰嶅璇句欢鍧囦负涓婃父浣滆€呯殑宸ヤ綔锛?> MIT 璁稿彲璇佸強鍏舵潯娆惧師鏍锋部鐢ㄣ€?
+> [!NOTE]
+> **0.2.0-rc.1 鏇存柊鍐呭锛?*
 >
-> - **已迁移到 Harness `0.2.0-rc.2`。** 压缩改为以**派生预设变体**（`<预设>--compression`）形式通过 0.2.0 的 `AgentPresetRegistry` 声明，取代 `0.1.x` 的路径装饰方案。**你原有的预设绝不会被改写。**
-> - **设置由 Profile 行本身提供。** Bundle 插入的行 id 是 `context-compression`，它同时也是设置 namespace，因此浏览器端选择器读取的正是这一行声明的表单。
-> - **现已支持 DeepSeek-V4.1-Flash，覆盖 Harness 默认路由。** `deepseek-flash` 可解析出随包提供的精确 tokenizer，不再安全降级为空转。
-> - 视觉图片 token 算术已按官方 V4.1 image processor 重移植：每张图片上限 384 → 1024、最小像素 147456 → 295936，且取消了宽高比裁剪。
->
-> 完整发布历史见 [CHANGELOG.md](CHANGELOG.md)。
-
+> - **宸茶縼绉诲埌 Harness `0.2.0-rc.2`銆?* 鍘嬬缉鏀逛负浠?*娲剧敓棰勮鍙樹綋**锛坄<棰勮>--compression`锛夊舰寮忛€氳繃 0.2.0 鐨?`AgentPresetRegistry` 澹版槑锛屽彇浠?`0.1.x` 鐨勮矾寰勮楗版柟妗堛€?*浣犲師鏈夌殑棰勮缁濅笉浼氳鏀瑰啓銆?*
+> - **璁剧疆鐢?Profile 琛屾湰韬彁渚涖€?* Bundle 鎻掑叆鐨勮 id 鏄?`context-compression`锛屽畠鍚屾椂涔熸槸璁剧疆 namespace锛屽洜姝ゆ祻瑙堝櫒绔€夋嫨鍣ㄨ鍙栫殑姝ｆ槸杩欎竴琛屽０鏄庣殑琛ㄥ崟銆?> - **鐜板凡鏀寔 DeepSeek-V4.1-Flash锛岃鐩?Harness 榛樿璺敱銆?* `deepseek-flash` 鍙В鏋愬嚭闅忓寘鎻愪緵鐨勭簿纭?tokenizer锛屼笉鍐嶅畨鍏ㄩ檷绾т负绌鸿浆銆?> - 瑙嗚鍥剧墖 token 绠楁湳宸叉寜瀹樻柟 V4.1 image processor 閲嶇Щ妞嶏細姣忓紶鍥剧墖涓婇檺 384 鈫?1024銆佹渶灏忓儚绱?147456 鈫?295936锛屼笖鍙栨秷浜嗗楂樻瘮瑁佸壀銆?>
+> 瀹屾暣鍙戝竷鍘嗗彶瑙?[CHANGELOG.md](CHANGELOG.md)銆?
 > [!IMPORTANT]
-> 本项目目前**只支持 DeepSeek 模型**。无损 token 测量与有损工具结果压缩依赖随包提供的 DeepSeek 官方 tokenizer。本版本精确支持的模型 id 为 `deepseek-flash`、`deepseek-v4-flash`、`deepseek-v4-pro` 和 `deepseek-v4-flash-vision-exp`。其他 DeepSeek Harness 模型（包括非 DeepSeek 提供商模型）会安全降级，保留原始工具结果。
+> 鏈」鐩洰鍓?*鍙敮鎸?DeepSeek 妯″瀷**銆傛棤鎹?token 娴嬮噺涓庢湁鎹熷伐鍏风粨鏋滃帇缂╀緷璧栭殢鍖呮彁渚涚殑 DeepSeek 瀹樻柟 tokenizer銆傛湰鐗堟湰绮剧‘鏀寔鐨勬ā鍨?id 涓?`deepseek-flash`銆乣deepseek-v4-flash`銆乣deepseek-v4-pro` 鍜?`deepseek-v4-flash-vision-exp`銆傚叾浠?DeepSeek Harness 妯″瀷锛堝寘鎷潪 DeepSeek 鎻愪緵鍟嗘ā鍨嬶級浼氬畨鍏ㄩ檷绾э紝淇濈暀鍘熷宸ュ叿缁撴灉銆?
+## 瀹冭В鍐充粈涔堥棶棰?
+闀挎湡杩愯鐨?Agent 浠诲姟浼氱Н绱ぇ閲忓伐鍏疯緭鍑恒€傛湰绀惧尯鎻掍欢鍦ㄤ笉淇敼 DeepSeek Harness 鏍稿績鐨勫墠鎻愪笅锛屼负杩欎簺宸ュ叿缁撴灉鎻愪緵鍙€夋嫨銆佸彲瀹¤鐨勪笂涓嬫枃鍘嬬缉绛栫暐銆?
+- **Fresh**锛氬湪妯″瀷绗竴娆℃帴鏀跺墠锛屽鍒氬彉寰楄繃澶х殑宸ュ叿缁撴灉鐗囨杩涜棰勫帇缂┿€?- **Aggregate**锛氳嫢鏂伴矞鍐呭浠嶈秴杩囧凡閰嶇疆棰勭畻锛屽垯鍐嶆杩涜棰勫帇缂┿€?- **History / micro-compact**锛氬湪淇濈暀杩戞湡宸ヤ綔涓婁笅鏂囩殑鍓嶆彁涓嬶紝鏇挎崲绗﹀悎鏉′欢鐨勬棫宸ュ叿缁撴灉銆?- **TailTrim**锛氫粎 Custom 鍙惎鐢ㄧ殑銆佸彲閫夌殑灏鹃儴瑁佸壀璺緞銆?- **Native**锛氬皢 Harness 椋庢牸鐨勨€滀繚鐣欏ご灏俱€佽鎺変腑闂粹€濈殑宸ュ叿缁撴灉瑁佸壀淇濈暀涓轰竴涓槑纭?Profile銆?
+鎻掍欢浼氳褰曞凡閫夋嫨鐨勭瓥鐣ュ強姣忔鍐崇瓥锛歴tage銆乺educer銆佽Е鍙戝師鍥犮€佽烦杩囧師鍥狅紝浠ュ強鍙敤鏃剁殑绮剧‘ token 鍓嶅悗鍊笺€?
+## 璁剧疆鐣岄潰
 
-## 它解决什么问题
-
-长期运行的 Agent 任务会积累大量工具输出。本社区插件在不修改 DeepSeek Harness 核心的前提下，为这些工具结果提供可选择、可审计的上下文压缩策略。
-
-- **Fresh**：在模型第一次接收前，对刚变得过大的工具结果片段进行预压缩。
-- **Aggregate**：若新鲜内容仍超过已配置预算，则再次进行预压缩。
-- **History / micro-compact**：在保留近期工作上下文的前提下，替换符合条件的旧工具结果。
-- **TailTrim**：仅 Custom 可启用的、可选的尾部裁剪路径。
-- **Native**：将 Harness 风格的“保留头尾、裁掉中间”的工具结果裁剪保留为一个明确 Profile。
-
-插件会记录已选择的策略及每次决策：stage、reducer、触发原因、跳过原因，以及可用时的精确 token 前后值。
-
-## 设置界面
-
-在 DeepSeek Harness 设置中选择压缩 Profile，并在同一 section 设置 Auto Compact 触发水位。一个 Session 首次观察到配置后会冻结该配置，因此之后修改设置只会影响新 Session，而不会悄悄改变正在运行的任务。
-
-Bundle 的 `cordis.patch.yml` 只插入一行 Profile，其 id —— `context-compression` —— **就是**设置 namespace。Harness `0.2.0` 按每个 Profile 行的 entry id 提供对应的设置表单，因此你安装的那一行就是浏览器读取的那张表单，不存在第二份需要同步的文档。若要重命名该行，必须同时重命名 `CONTEXT_COMPRESSION_SETTINGS_NAMESPACE`，否则表单会被孤立。
-
-### 压缩是如何进入 Session 的（`0.2.0`）
-
-Harness `0.2.0` 让 `AgentPresetRegistry` 成为预设组合的唯一权威：预设由它的 owner 声明（`register({ id, plugins })`），发现机制不再扫描目录。因此插件无法再就地装饰别人的预设，`0.1.x` 的 overlay 机制已不复存在。
-
-本 Bundle 改为声明**派生变体**：对注册表已列出的每一个预设，插件注册一个同源的兄弟预设，id 为 `<来源>--compression`、名称为 `<来源名> · Context compression`，其条目列表是来源自身的行加上压缩栈。变体按不同的压缩配置发布一次，并带引用计数，因此内置行与 Bundle 行绝不会装入两套压缩栈；行被释放时只会撤回它自己注册的那批变体。被插件排除的预设、以及被标记为 `broken` 的预设不会生成变体。
-
-在你的 Profile 中选择变体预设（例如用 `standard--compression` 而不是 `standard`）即可启用压缩；来源预设仍照常可用。
-
-变体之所以必要，是因为压缩 runtime 必须与消费它的 compactor 处于同一个 scope 组内：它提供 `toolResultPruner`，而 `dsh-compaction` 只会在自己隔离的 realm 中解析该服务。把 runtime 挂在根级无法触及它 —— 预设组合是唯一受支持的路径。
-
-### Auto Compact 阈值
-
-选择器设置页提供 `autoCompact.thresholdPercent`：50%–90% 的整数（步长 1%），默认 80%。可直接在输入框填写 73% 等任意合法值。超出推荐区间 70%–85% 时会显示风险说明，但仍然允许保存。该水位会作为 `thresholdRatio` 写入生成的 `compaction-basic` 组合，并在同一次读取中写入插件 runtime 的部署配置，因此同一个 standing generation 绝不会让 Auto Compact 与 micro compact 运行在两个不同阈值上。它按 `A = floor(C × a)`（`a = thresholdPercent / 100`，以浮点比例参与运算——与 `compaction-basic` 自身的运算顺序一致）联动标准 Profile 的 History 触发值、最小回收量与近期尾窗，以及 micro compact 最后机会水位 `D = floor(A × 0.875)`。默认 80% 在 1M 上下文下完全复现原有数值。Fresh、Aggregate、Native 单结果预算、近期 10 次调用工作集和 Auto Compact retain 比例本版保持不变；Custom 保持手动。
-
-![上下文压缩选择器设置界面](docs/assets/context-compression-selector-settings.png)
+鍦?DeepSeek Harness 璁剧疆涓€夋嫨鍘嬬缉 Profile锛屽苟鍦ㄥ悓涓€ section 璁剧疆 Auto Compact 瑙﹀彂姘翠綅銆備竴涓?Session 棣栨瑙傚療鍒伴厤缃悗浼氬喕缁撹閰嶇疆锛屽洜姝や箣鍚庝慨鏀硅缃彧浼氬奖鍝嶆柊 Session锛岃€屼笉浼氭倓鎮勬敼鍙樻鍦ㄨ繍琛岀殑浠诲姟銆?
+Bundle 鐨?`cordis.patch.yml` 鍙彃鍏ヤ竴琛?Profile锛屽叾 id 鈥斺€?`context-compression` 鈥斺€?**灏辨槸**璁剧疆 namespace銆侶arness `0.2.0` 鎸夋瘡涓?Profile 琛岀殑 entry id 鎻愪緵瀵瑰簲鐨勮缃〃鍗曪紝鍥犳浣犲畨瑁呯殑閭ｄ竴琛屽氨鏄祻瑙堝櫒璇诲彇鐨勯偅寮犺〃鍗曪紝涓嶅瓨鍦ㄧ浜屼唤闇€瑕佸悓姝ョ殑鏂囨。銆傝嫢瑕侀噸鍛藉悕璇ヨ锛屽繀椤诲悓鏃堕噸鍛藉悕 `CONTEXT_COMPRESSION_SETTINGS_NAMESPACE`锛屽惁鍒欒〃鍗曚細琚绔嬨€?
+### 鍘嬬缉鏄浣曡繘鍏?Session 鐨勶紙`0.2.0`锛?
+Harness `0.2.0` 璁?`AgentPresetRegistry` 鎴愪负棰勮缁勫悎鐨勫敮涓€鏉冨▉锛氶璁剧敱瀹冪殑 owner 澹版槑锛坄register({ id, plugins })`锛夛紝鍙戠幇鏈哄埗涓嶅啀鎵弿鐩綍銆傚洜姝ゆ彃浠舵棤娉曞啀灏卞湴瑁呴グ鍒汉鐨勯璁撅紝`0.1.x` 鐨?overlay 鏈哄埗宸蹭笉澶嶅瓨鍦ㄣ€?
+鏈?Bundle 鏀逛负澹版槑**娲剧敓鍙樹綋**锛氬娉ㄥ唽琛ㄥ凡鍒楀嚭鐨勬瘡涓€涓璁撅紝鎻掍欢娉ㄥ唽涓€涓悓婧愮殑鍏勫紵棰勮锛宨d 涓?`<鏉ユ簮>--compression`銆佸悕绉颁负 `<鏉ユ簮鍚? 路 Context compression`锛屽叾鏉＄洰鍒楄〃鏄潵婧愯嚜韬殑琛屽姞涓婂帇缂╂爤銆傚彉浣撴寜涓嶅悓鐨勫帇缂╅厤缃彂甯冧竴娆★紝骞跺甫寮曠敤璁℃暟锛屽洜姝ゅ唴缃涓?Bundle 琛岀粷涓嶄細瑁呭叆涓ゅ鍘嬬缉鏍堬紱琛岃閲婃斁鏃跺彧浼氭挙鍥炲畠鑷繁娉ㄥ唽鐨勯偅鎵瑰彉浣撱€傝鎻掍欢鎺掗櫎鐨勯璁俱€佷互鍙婅鏍囪涓?`broken` 鐨勯璁句笉浼氱敓鎴愬彉浣撱€?
+鍦ㄤ綘鐨?Profile 涓€夋嫨鍙樹綋棰勮锛堜緥濡傜敤 `standard--compression` 鑰屼笉鏄?`standard`锛夊嵆鍙惎鐢ㄥ帇缂╋紱鏉ユ簮棰勮浠嶇収甯稿彲鐢ㄣ€?
+鍙樹綋涔嬫墍浠ュ繀瑕侊紝鏄洜涓哄帇缂?runtime 蹇呴』涓庢秷璐瑰畠鐨?compactor 澶勪簬鍚屼竴涓?scope 缁勫唴锛氬畠鎻愪緵 `toolResultPruner`锛岃€?`dsh-compaction` 鍙細鍦ㄨ嚜宸遍殧绂荤殑 realm 涓В鏋愯鏈嶅姟銆傛妸 runtime 鎸傚湪鏍圭骇鏃犳硶瑙﹀強瀹?鈥斺€?棰勮缁勫悎鏄敮涓€鍙楁敮鎸佺殑璺緞銆?
+### Auto Compact 闃堝€?
+閫夋嫨鍣ㄨ缃〉鎻愪緵 `autoCompact.thresholdPercent`锛?0%鈥?0% 鐨勬暣鏁帮紙姝ラ暱 1%锛夛紝榛樿 80%銆傚彲鐩存帴鍦ㄨ緭鍏ユ濉啓 73% 绛変换鎰忓悎娉曞€笺€傝秴鍑烘帹鑽愬尯闂?70%鈥?5% 鏃朵細鏄剧ず椋庨櫓璇存槑锛屼絾浠嶇劧鍏佽淇濆瓨銆傝姘翠綅浼氫綔涓?`thresholdRatio` 鍐欏叆鐢熸垚鐨?`compaction-basic` 缁勫悎锛屽苟鍦ㄥ悓涓€娆¤鍙栦腑鍐欏叆鎻掍欢 runtime 鐨勯儴缃查厤缃紝鍥犳鍚屼竴涓?standing generation 缁濅笉浼氳 Auto Compact 涓?micro compact 杩愯鍦ㄤ袱涓笉鍚岄槇鍊间笂銆傚畠鎸?`A = floor(C 脳 a)`锛坄a = thresholdPercent / 100`锛屼互娴偣姣斾緥鍙備笌杩愮畻鈥斺€斾笌 `compaction-basic` 鑷韩鐨勮繍绠楅『搴忎竴鑷达級鑱斿姩鏍囧噯 Profile 鐨?History 瑙﹀彂鍊笺€佹渶灏忓洖鏀堕噺涓庤繎鏈熷熬绐楋紝浠ュ強 micro compact 鏈€鍚庢満浼氭按浣?`D = floor(A 脳 0.875)`銆傞粯璁?80% 鍦?1M 涓婁笅鏂囦笅瀹屽叏澶嶇幇鍘熸湁鏁板€笺€侳resh銆丄ggregate銆丯ative 鍗曠粨鏋滈绠椼€佽繎鏈?10 娆¤皟鐢ㄥ伐浣滈泦鍜?Auto Compact retain 姣斾緥鏈増淇濇寔涓嶅彉锛汣ustom 淇濇寔鎵嬪姩銆?
+![涓婁笅鏂囧帇缂╅€夋嫨鍣ㄨ缃晫闈(docs/assets/context-compression-selector-settings.png)
 
 
-## 适合谁使用
-
-这是一个高级插件。对于不了解 Agent 上下文、工具结果压缩、上下文窗口、Prompt Cache，以及“确定性工具结果压缩”和“模型驱动 Auto Compact”区别的大多数用户而言，它并不友好。
-
-若这些概念还不熟悉，本插件可能不是合适的起点。它需要你先理解各机制、Profile、取舍和使用方法，再去修改压缩设置。
-
-## 模型支持与安全边界
-
-运行时随包提供固定版本的 DeepSeek V4 官方 tokenizer 资源，并验证其 SHA-256。精确 token 测量是安全前提：没有它时，插件不会执行有损改写。
-
-| 模型路由 | 服务模型 | 选择器压缩 |
+## 閫傚悎璋佷娇鐢?
+杩欐槸涓€涓珮绾ф彃浠躲€傚浜庝笉浜嗚В Agent 涓婁笅鏂囥€佸伐鍏风粨鏋滃帇缂┿€佷笂涓嬫枃绐楀彛銆丳rompt Cache锛屼互鍙娾€滅‘瀹氭€у伐鍏风粨鏋滃帇缂┾€濆拰鈥滄ā鍨嬮┍鍔?Auto Compact鈥濆尯鍒殑澶у鏁扮敤鎴疯€岃█锛屽畠骞朵笉鍙嬪ソ銆?
+鑻ヨ繖浜涙蹇佃繕涓嶇啛鎮夛紝鏈彃浠跺彲鑳戒笉鏄悎閫傜殑璧风偣銆傚畠闇€瑕佷綘鍏堢悊瑙ｅ悇鏈哄埗銆丳rofile銆佸彇鑸嶅拰浣跨敤鏂规硶锛屽啀鍘讳慨鏀瑰帇缂╄缃€?
+## 妯″瀷鏀寔涓庡畨鍏ㄨ竟鐣?
+杩愯鏃堕殢鍖呮彁渚涘浐瀹氱増鏈殑 DeepSeek V4 瀹樻柟 tokenizer 璧勬簮锛屽苟楠岃瘉鍏?SHA-256銆傜簿纭?token 娴嬮噺鏄畨鍏ㄥ墠鎻愶細娌℃湁瀹冩椂锛屾彃浠朵笉浼氭墽琛屾湁鎹熸敼鍐欍€?
+| 妯″瀷璺敱 | 鏈嶅姟妯″瀷 | 閫夋嫨鍣ㄥ帇缂?|
 | --- | --- | --- |
-| `deepseek-flash` | `DeepSeek-V4.1-Flash` | 支持：文本精确计数及有界图片 token 估算；含图片的改写候选仍不具备 exact 资格并保持原样 |
-| `deepseek-v4-flash` | `DeepSeek-V4.1-Flash` | 支持 |
-| `deepseek-v4-flash-vision-exp` | `DeepSeek-V4.1-Flash` | 支持：文本精确计数及有界图片 token 估算；含图片的改写候选仍不具备 exact 资格并保持原样 |
-| `deepseek-v4-pro` | `DeepSeek-V4-Pro` | 支持 |
-| 其他 DeepSeek 模型 id | — | 不支持；安全降级 |
-| DeepSeek Harness 中的非 DeepSeek 模型 | — | 不支持；安全降级 |
+| `deepseek-flash` | `DeepSeek-V4.1-Flash` | 鏀寔锛氭枃鏈簿纭鏁板強鏈夌晫鍥剧墖 token 浼扮畻锛涘惈鍥剧墖鐨勬敼鍐欏€欓€変粛涓嶅叿澶?exact 璧勬牸骞朵繚鎸佸師鏍?|
+| `deepseek-v4-flash` | `DeepSeek-V4.1-Flash` | 鏀寔 |
+| `deepseek-v4-flash-vision-exp` | `DeepSeek-V4.1-Flash` | 鏀寔锛氭枃鏈簿纭鏁板強鏈夌晫鍥剧墖 token 浼扮畻锛涘惈鍥剧墖鐨勬敼鍐欏€欓€変粛涓嶅叿澶?exact 璧勬牸骞朵繚鎸佸師鏍?|
+| `deepseek-v4-pro` | `DeepSeek-V4-Pro` | 鏀寔 |
+| 鍏朵粬 DeepSeek 妯″瀷 id | 鈥?| 涓嶆敮鎸侊紱瀹夊叏闄嶇骇 |
+| DeepSeek Harness 涓殑闈?DeepSeek 妯″瀷 | 鈥?| 涓嶆敮鎸侊紱瀹夊叏闄嶇骇 |
 
-V4.1-Flash 各路由由捆绑的官方 tokenizer 提供服务，固定在 `deepseek-ai/DeepSeek-V4.1-Flash` revision `dba1be0a40aa45a94ad051997016db3960a90277`；`deepseek-v4-pro` 保留自己独立固定的 `deepseek-ai/DeepSeek-V4-Pro` tokenizer。两套词表绝不互为别名。视觉图片 token 使用官方 V4.1 图像处理算术的逐行移植计算（patch 14、downsample 3、1024 token 上限、最小像素 295936，且官方 config 将 `max_wh_ratio` 固定为 `null` 故无宽高比裁剪），并以官方 Python 参考实现生成的 golden fixtures 逐项验证。V4.1 的块长度恒为 `nLlmH * (nLlmW + 1) + 2`，不含任何对齐 padding，因此与绝对序列化位置无关。有效图片以该块长度上报为 `tokenizer-estimate`，同时保留每张图片 1024 token 的保守上限；尺寸畸形或无法计算时固定计为 256 token，不再使整个视觉 surface 变为不可用。这些数值仍是估算，因为当前计量边界没有公开 adapter 最终请求图片投影（包括按路由覆盖像素预算和字节上限二次投影）；例如 800×800 上传被投影为 512×512 时，实际 token 会与 intrinsic 估算产生较大差异。估算值改善压力统计，但不会授权有损改写：含图片的工具结果候选仍不具备 exact 资格，不会被改写、删除或按零 token 计。若上游以后公开投影后尺寸，即可进一步升级为精确计数。
+V4.1-Flash 鍚勮矾鐢辩敱鎹嗙粦鐨勫畼鏂?tokenizer 鎻愪緵鏈嶅姟锛屽浐瀹氬湪 `deepseek-ai/DeepSeek-V4.1-Flash` revision `dba1be0a40aa45a94ad051997016db3960a90277`锛沗deepseek-v4-pro` 淇濈暀鑷繁鐙珛鍥哄畾鐨?`deepseek-ai/DeepSeek-V4-Pro` tokenizer銆備袱濂楄瘝琛ㄧ粷涓嶄簰涓哄埆鍚嶃€傝瑙夊浘鐗?token 浣跨敤瀹樻柟 V4.1 鍥惧儚澶勭悊绠楁湳鐨勯€愯绉绘璁＄畻锛坧atch 14銆乨ownsample 3銆?024 token 涓婇檺銆佹渶灏忓儚绱?295936锛屼笖瀹樻柟 config 灏?`max_wh_ratio` 鍥哄畾涓?`null` 鏁呮棤瀹介珮姣旇鍓級锛屽苟浠ュ畼鏂?Python 鍙傝€冨疄鐜扮敓鎴愮殑 golden fixtures 閫愰」楠岃瘉銆俈4.1 鐨勫潡闀垮害鎭掍负 `nLlmH * (nLlmW + 1) + 2`锛屼笉鍚换浣曞榻?padding锛屽洜姝や笌缁濆搴忓垪鍖栦綅缃棤鍏炽€傛湁鏁堝浘鐗囦互璇ュ潡闀垮害涓婃姤涓?`tokenizer-estimate`锛屽悓鏃朵繚鐣欐瘡寮犲浘鐗?1024 token 鐨勪繚瀹堜笂闄愶紱灏哄鐣稿舰鎴栨棤娉曡绠楁椂鍥哄畾璁′负 256 token锛屼笉鍐嶄娇鏁翠釜瑙嗚 surface 鍙樹负涓嶅彲鐢ㄣ€傝繖浜涙暟鍊间粛鏄及绠楋紝鍥犱负褰撳墠璁￠噺杈圭晫娌℃湁鍏紑 adapter 鏈€缁堣姹傚浘鐗囨姇褰憋紙鍖呮嫭鎸夎矾鐢辫鐩栧儚绱犻绠楀拰瀛楄妭涓婇檺浜屾鎶曞奖锛夛紱渚嬪 800脳800 涓婁紶琚姇褰变负 512脳512 鏃讹紝瀹為檯 token 浼氫笌 intrinsic 浼扮畻浜х敓杈冨ぇ宸紓銆備及绠楀€兼敼鍠勫帇鍔涚粺璁★紝浣嗕笉浼氭巿鏉冩湁鎹熸敼鍐欙細鍚浘鐗囩殑宸ュ叿缁撴灉鍊欓€変粛涓嶅叿澶?exact 璧勬牸锛屼笉浼氳鏀瑰啓銆佸垹闄ゆ垨鎸夐浂 token 璁°€傝嫢涓婃父浠ュ悗鍏紑鎶曞奖鍚庡昂瀵革紝鍗冲彲杩涗竴姝ュ崌绾т负绮剧‘璁℃暟銆?
+鈥滃畨鍏ㄩ檷绾р€濊〃绀哄師濮嬪伐鍏风粨鏋滀細淇濈暀鍦ㄤ笂涓嬫枃涓紝骞朵骇鐢熷彲瀹¤鐨勮烦杩囨垨澶辫触璁板綍銆傞€夋嫨鍣ㄤ笉浼氫娇鐢ㄥ瓧绗︽暟浼扮畻 token锛屼篃涓嶈兘琚綋鎴愰€氱敤銆佸鎻愪緵鍟嗙殑鍘嬬缉鍣ㄣ€?
+## 棰勫帇缂╀笌鍘嗗彶鍘嬬缉骞朵笉鐩稿悓
 
-“安全降级”表示原始工具结果会保留在上下文中，并产生可审计的跳过或失败记录。选择器不会使用字符数估算 token，也不能被当成通用、多提供商的压缩器。
-
-## 预压缩与历史压缩并不相同
-
-**Fresh 和 Aggregate 是预压缩，不是 History 压缩。**它们会在新工具结果第一次交给模型之前执行。reducer 会根据工具名、命令参数和内容证据选择安全策略，例如 JSON、搜索、文件读取、Git、包管理、构建、测试或 Shell 输出。它们只限制新增加的内容，不会改写已经发给提供商的序列化 prompt 前缀，因此不会破坏已有的 Prompt Cache。
-
-**History / micro-compact 是历史压缩。**它会选择保护工作集之外的旧工具结果，并在活动上下文中将每一条选中的结果替换为短小、可恢复的多行占位记录；该记录以 `[Old tool result content cleared from active context]` 开始，并保留工具名、状态、来源引用和检索指令，原始的持久化事件仍可恢复。它有意改写已经发送过的前缀，因此会破坏或重新开始 Prompt Cache。History 在处理旧结果前，会保护“最近 10 次 Agent 工具调用”和“最近 64,000 个工具结果 token”的并集。
-
-## Profile 如何评估
+**Fresh 鍜?Aggregate 鏄鍘嬬缉锛屼笉鏄?History 鍘嬬缉銆?*瀹冧滑浼氬湪鏂板伐鍏风粨鏋滅涓€娆′氦缁欐ā鍨嬩箣鍓嶆墽琛屻€俽educer 浼氭牴鎹伐鍏峰悕銆佸懡浠ゅ弬鏁板拰鍐呭璇佹嵁閫夋嫨瀹夊叏绛栫暐锛屼緥濡?JSON銆佹悳绱€佹枃浠惰鍙栥€丟it銆佸寘绠＄悊銆佹瀯寤恒€佹祴璇曟垨 Shell 杈撳嚭銆傚畠浠彧闄愬埗鏂板鍔犵殑鍐呭锛屼笉浼氭敼鍐欏凡缁忓彂缁欐彁渚涘晢鐨勫簭鍒楀寲 prompt 鍓嶇紑锛屽洜姝や笉浼氱牬鍧忓凡鏈夌殑 Prompt Cache銆?
+**History / micro-compact 鏄巻鍙插帇缂┿€?*瀹冧細閫夋嫨淇濇姢宸ヤ綔闆嗕箣澶栫殑鏃у伐鍏风粨鏋滐紝骞跺湪娲诲姩涓婁笅鏂囦腑灏嗘瘡涓€鏉￠€変腑鐨勭粨鏋滄浛鎹负鐭皬銆佸彲鎭㈠鐨勫琛屽崰浣嶈褰曪紱璇ヨ褰曚互 `[Old tool result content cleared from active context]` 寮€濮嬶紝骞朵繚鐣欏伐鍏峰悕銆佺姸鎬併€佹潵婧愬紩鐢ㄥ拰妫€绱㈡寚浠わ紝鍘熷鐨勬寔涔呭寲浜嬩欢浠嶅彲鎭㈠銆傚畠鏈夋剰鏀瑰啓宸茬粡鍙戦€佽繃鐨勫墠缂€锛屽洜姝や細鐮村潖鎴栭噸鏂板紑濮?Prompt Cache銆侶istory 鍦ㄥ鐞嗘棫缁撴灉鍓嶏紝浼氫繚鎶も€滄渶杩?10 娆?Agent 宸ュ叿璋冪敤鈥濆拰鈥滄渶杩?64,000 涓伐鍏风粨鏋?token鈥濈殑骞堕泦銆?
+## Profile 濡備綍璇勪及
 
 ```mermaid
 flowchart TD
-    A[已选择的 Profile] --> B{Profile 类型}
-    B -- Off --> C[保持工具结果不变]
-    B -- Native --> D[原生头-中-尾工具结果裁剪]
-    B -- Balanced / Cache Strict / Savings / Adaptive / Custom --> E{满足 Fresh 条件？}
-    E -- 是 --> F[Fresh]
-    E -- 否 --> G{满足 Aggregate 条件？}
+    A[宸查€夋嫨鐨?Profile] --> B{Profile 绫诲瀷}
+    B -- Off --> C[淇濇寔宸ュ叿缁撴灉涓嶅彉]
+    B -- Native --> D[鍘熺敓澶?涓?灏惧伐鍏风粨鏋滆鍓猐
+    B -- Balanced / Cache Strict / Savings / Adaptive / Custom --> E{婊¤冻 Fresh 鏉′欢锛焳
+    E -- 鏄?--> F[Fresh]
+    E -- 鍚?--> G{婊¤冻 Aggregate 鏉′欢锛焳
     F --> G
-    G -- 是 --> H[Aggregate]
-    G -- 否 --> I{满足 History 条件？}
+    G -- 鏄?--> H[Aggregate]
+    G -- 鍚?--> I{婊¤冻 History 鏉′欢锛焳
     H --> I
-    I -- 是 --> J[History / micro-compact]
-    I -- 否 --> K{已启用 Custom TailTrim 且工具组安全？}
+    I -- 鏄?--> J[History / micro-compact]
+    I -- 鍚?--> K{宸插惎鐢?Custom TailTrim 涓斿伐鍏风粍瀹夊叏锛焳
     J --> K
-    K -- 是 --> L[TailTrim]
-    K -- 否 --> M[保留其余上下文]
+    K -- 鏄?--> L[TailTrim]
+    K -- 鍚?--> M[淇濈暀鍏朵綑涓婁笅鏂嘳
     L --> M
-    N[Harness/模型原生 auto-compact] -. 独立机制 .-> M
+    N[Harness/妯″瀷鍘熺敓 auto-compact] -. 鐙珛鏈哄埗 .-> M
 ```
 
-一个模式处于“启用”状态，不表示它一定会运行。它的阈值、安全检查、精确 tokenizer 可用性和最低回收量都必须满足。除 `native` 外，所有选择器 Profile 都会关闭 Harness 原生的头-中-尾工具结果裁剪，使选择器成为唯一的工具结果压缩器。模型驱动的原生 auto-compact 仍是独立的 Harness/模型机制，插件只对它单独审计。
-
-## Profile 一览
-
-Profile 是编排策略，不是彼此独立的压缩算法。一个 Profile 会组合这些已有方法，决定启用哪些方法、评估顺序、阈值、保留工作集、最低回收量以及缓存安全方面的取舍。
-
-| Profile | Fresh / Aggregate | History | 原生工具裁剪 | TailTrim |
+涓€涓ā寮忓浜庘€滃惎鐢ㄢ€濈姸鎬侊紝涓嶈〃绀哄畠涓€瀹氫細杩愯銆傚畠鐨勯槇鍊笺€佸畨鍏ㄦ鏌ャ€佺簿纭?tokenizer 鍙敤鎬у拰鏈€浣庡洖鏀堕噺閮藉繀椤绘弧瓒炽€傞櫎 `native` 澶栵紝鎵€鏈夐€夋嫨鍣?Profile 閮戒細鍏抽棴 Harness 鍘熺敓鐨勫ご-涓?灏惧伐鍏风粨鏋滆鍓紝浣块€夋嫨鍣ㄦ垚涓哄敮涓€鐨勫伐鍏风粨鏋滃帇缂╁櫒銆傛ā鍨嬮┍鍔ㄧ殑鍘熺敓 auto-compact 浠嶆槸鐙珛鐨?Harness/妯″瀷鏈哄埗锛屾彃浠跺彧瀵瑰畠鍗曠嫭瀹¤銆?
+## Profile 涓€瑙?
+Profile 鏄紪鎺掔瓥鐣ワ紝涓嶆槸褰兼鐙珛鐨勫帇缂╃畻娉曘€備竴涓?Profile 浼氱粍鍚堣繖浜涘凡鏈夋柟娉曪紝鍐冲畾鍚敤鍝簺鏂规硶銆佽瘎浼伴『搴忋€侀槇鍊笺€佷繚鐣欏伐浣滈泦銆佹渶浣庡洖鏀堕噺浠ュ強缂撳瓨瀹夊叏鏂归潰鐨勫彇鑸嶃€?
+| Profile | Fresh / Aggregate | History | 鍘熺敓宸ュ叿瑁佸壀 | TailTrim |
 | --- | --- | --- | --- | --- |
-| Off | 关闭 | 关闭 | 关闭 | 关闭 |
-| Native | 关闭 | 关闭 | 启用（`4096 → 2048`） | 关闭 |
-| Balanced | `8192 → 3072` / `32768 → 12288` | `500000` 常规触发；保护最近 10 次调用和 64,000 token 尾窗 | 关闭 | 关闭 |
-| Cache Strict | 与 Balanced 相同 | 完整请求达到 `D = 700000` 时进入最后机会；达到 `D` 后，即使工具结果 token 不高于 `H = 600000`，planner 也可以运行 | 关闭 | 关闭 |
-| Savings | `4096 → 1536` / `16384 → 4096` | `400000` 常规触发 | 关闭 | 关闭 |
-| Adaptive | 与 Balanced 相同 | `500000` 下基于保守估算的路由；容量压力可作为安全覆盖 | 关闭 | 关闭 |
-| Custom | 可配置 | 可配置 | 关闭 | 可选，默认关闭 |
+| Off | 鍏抽棴 | 鍏抽棴 | 鍏抽棴 | 鍏抽棴 |
+| Native | 鍏抽棴 | 鍏抽棴 | 鍚敤锛坄4096 鈫?2048`锛?| 鍏抽棴 |
+| Balanced | `8192 鈫?3072` / `32768 鈫?12288` | `500000` 甯歌瑙﹀彂锛涗繚鎶ゆ渶杩?10 娆¤皟鐢ㄥ拰 64,000 token 灏剧獥 | 鍏抽棴 | 鍏抽棴 |
+| Cache Strict | 涓?Balanced 鐩稿悓 | 瀹屾暣璇锋眰杈惧埌 `D = 700000` 鏃惰繘鍏ユ渶鍚庢満浼氾紱杈惧埌 `D` 鍚庯紝鍗充娇宸ュ叿缁撴灉 token 涓嶉珮浜?`H = 600000`锛宲lanner 涔熷彲浠ヨ繍琛?| 鍏抽棴 | 鍏抽棴 |
+| Savings | `4096 鈫?1536` / `16384 鈫?4096` | `400000` 甯歌瑙﹀彂 | 鍏抽棴 | 鍏抽棴 |
+| Adaptive | 涓?Balanced 鐩稿悓 | `500000` 涓嬪熀浜庝繚瀹堜及绠楃殑璺敱锛涘閲忓帇鍔涘彲浣滀负瀹夊叏瑕嗙洊 | 鍏抽棴 | 鍏抽棴 |
+| Custom | 鍙厤缃?| 鍙厤缃?| 鍏抽棴 | 鍙€夛紝榛樿鍏抽棴 |
 
-History 会保护“最近 10 次 Agent 工具调用”和“最近 64,000 个工具结果 token”的并集。只有能够满足该策略最低回收量时，较早且合格的结果才会被改写。表中 History 触发值、最小回收量与尾窗均为 Auto Compact 默认水位 80% 下的数值；调整阈值后按 `A = floor(C × a)`（`a = thresholdPercent / 100`，浮点比例）同比缩放（见上文“Auto Compact 阈值”）。
+History 浼氫繚鎶も€滄渶杩?10 娆?Agent 宸ュ叿璋冪敤鈥濆拰鈥滄渶杩?64,000 涓伐鍏风粨鏋?token鈥濈殑骞堕泦銆傚彧鏈夎兘澶熸弧瓒宠绛栫暐鏈€浣庡洖鏀堕噺鏃讹紝杈冩棭涓斿悎鏍肩殑缁撴灉鎵嶄細琚敼鍐欍€傝〃涓?History 瑙﹀彂鍊笺€佹渶灏忓洖鏀堕噺涓庡熬绐楀潎涓?Auto Compact 榛樿姘翠綅 80% 涓嬬殑鏁板€硷紱璋冩暣闃堝€煎悗鎸?`A = floor(C 脳 a)`锛坄a = thresholdPercent / 100`锛屾诞鐐规瘮渚嬶級鍚屾瘮缂╂斁锛堣涓婃枃鈥淎uto Compact 闃堝€尖€濓級銆?
+### Adaptive 鐨勫綋鍓嶉檺鍒朵笌涓婃父鑳藉姏璇锋眰
 
-### Adaptive 的当前限制与上游能力请求
+Adaptive 鍦ㄨ缃晫闈腑鏄剧ず涓?*淇濆畧鎴愭湰**銆傚畠鐩墠鏈夋剰涓嶆槸涓€涓畬缇庣殑鑷€傚簲缂撳瓨浼樺寲鍣細瀹冧緷鎹綋鍓嶅彲寰楃殑璇锋眰 usage銆佹ā鍨嬩环鏍煎拰鍚屼竴 tokenizer 鐨勬祴閲忕粨鏋滀綔淇濆畧浼扮畻锛涜繖浜涜緭鍏ヤ笉瀹屾暣鏃朵細瀹夊叏闄嶇骇銆傚畠鏃犳硶瑙傚療鎴栨帶鍒剁簿纭殑缂撳瓨鏂偣銆佺紦瀛樺垎閰嶅拰缂撳瓨瀛樻椿鏃堕棿銆?
+瑕佸疄鐜板畬缇庣殑 Adaptive锛岄渶瑕?DeepSeek 鎻愪緵缂撳瓨鏂偣鎺у埗锛屼互鍙婄紦瀛?TTL/瀛樻椿鏃堕棿璇佹嵁銆傝繖浜涜兘鍔涚洰鍓嶆病鏈夐€氳繃 DeepSeek Harness 鎴栨彁渚涘晢鍏紑 API 鎻愪緵缁欐湰鎻掍欢銆備笂娓歌兘鍔涜姹傦細@deepseek-ai 鍜?[deepseek-ai/deepseek-harness](https://github.com/deepseek-ai/deepseek-harness)銆?
+## 鍏煎鎬?
+- 宸插熀浜?DeepSeek Harness `0.2.2-rc.1` 楠岃瘉锛屽苟涓斿彧浣跨敤鍏紑鐨勬彃浠朵笌 Profile API銆?- 闇€瑕?Node `^22.19.0 || >=24`銆?- **瑕佹眰 Harness `0.2.2-rc.1`銆?* 鏈垎鏀笌 `0.1.x` Harness 浜у搧绾?*涓嶅吋瀹?*锛氬凡鍙戝竷鐨?`0.1.1` 闈㈠悜 `dsh-v0.1.1-rc.2`锛岃€屾湰宸ヤ綔鏍戝凡杩佺Щ鍒?`0.2.2-rc.1` 鐨勫叕寮€ API 闈紙`AgentPresetRegistry.register()` 棰勮鍙樹綋銆乣SettingsForms.describe()` 璁剧疆璇诲彇銆乣ConfigForms` 椹卞姩鐨?`settings.section`銆乣snapshotEvents()` / `inheritedEventCount` 浼氳瘽璇诲彇銆佸甫鍝佺墝鐨?`SessionSeq`锛屼互鍙?`AgentLoop.create()` 杩斿洖 `Promise<Agent>`锛夈€傝杩?`0.1.x` Profile 浼氬姞杞藉け璐ャ€?- 鏈」鐩彧鍖呭惈璇?Bundle 涓?runtime锛屼笉 vendoring 鎴栦慨鏀?DeepSeek Harness 鏍稿績銆?- 杩欐槸闈炲畼鏂圭ぞ鍖洪」鐩紝涓?DeepSeek 涓嶅瓨鍦ㄩ毝灞炴垨鑳屼功鍏崇郴銆?
+## 寮€鍙戜笌瀹夊叏
 
-Adaptive 在设置界面中显示为**保守成本**。它目前有意不是一个完美的自适应缓存优化器：它依据当前可得的请求 usage、模型价格和同一 tokenizer 的测量结果作保守估算；这些输入不完整时会安全降级。它无法观察或控制精确的缓存断点、缓存分配和缓存存活时间。
-
-要实现完美的 Adaptive，需要 DeepSeek 提供缓存断点控制，以及缓存 TTL/存活时间证据。这些能力目前没有通过 DeepSeek Harness 或提供商公开 API 提供给本插件。上游能力请求：@deepseek-ai 和 [deepseek-ai/deepseek-harness](https://github.com/deepseek-ai/deepseek-harness)。
-
-## 兼容性
-
-- 已基于 DeepSeek Harness `0.2.1-rc.5` 验证，并且只使用公开的插件与 Profile API。
-- 需要 Node `^22.19.0 || >=24`。
-- **要求 Harness `0.2.1-rc.5`。** 本分支与 `0.1.x` Harness 产品线**不兼容**：已发布的 `0.1.1` 面向 `dsh-v0.1.1-rc.2`，而本工作树已迁移到 `0.2.1-rc.5` 的公开 API 面（`AgentPresetRegistry.register()` 预设变体、`SettingsForms.describe()` 设置读取、`ConfigForms` 驱动的 `settings.section`、`snapshotEvents()` / `inheritedEventCount` 会话读取、带品牌的 `SessionSeq`，以及 `AgentLoop.create()` 返回 `Promise<Agent>`）。装进 `0.1.x` Profile 会加载失败。
-- 本项目只包含该 Bundle 与 runtime，不 vendoring 或修改 DeepSeek Harness 核心。
-- 这是非官方社区项目，与 DeepSeek 不存在隶属或背书关系。
-
-## 开发与安全
-
-可使用以下命令运行面向发布的本地检查：
+鍙娇鐢ㄤ互涓嬪懡浠よ繍琛岄潰鍚戝彂甯冪殑鏈湴妫€鏌ワ細
 
 ```sh
 pnpm run typecheck
@@ -259,90 +188,70 @@ pnpm run test:e2e:packed
 pnpm run verify:release
 ```
 
-开发约定见 [CONTRIBUTING.md](CONTRIBUTING.md)，安全漏洞报告见 [SECURITY.md](SECURITY.md)，bundled tokenizer 的来源与许可证见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+寮€鍙戠害瀹氳 [CONTRIBUTING.md](CONTRIBUTING.md)锛屽畨鍏ㄦ紡娲炴姤鍛婅 [SECURITY.md](SECURITY.md)锛宐undled tokenizer 鐨勬潵婧愪笌璁稿彲璇佽 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)銆?
+## 瀹夎
 
-## 安装
+### 浠庢簮鐮佸畨瑁咃紙鏈湴鏈彂甯冩瀯寤猴級
 
-### 从源码安装（本地未发布构建）
-
-本工作树是 **`0.2.1-rc.5`**，面向 Harness **`0.2.1-rc.5`**。npm 上 `latest` 通道当前是 **`0.1.1`**（面向 `dsh-v0.1.1-rc.2`，与本分支不兼容）。因此请按下面的方式从本地 tarball 安装。
-
+鏈伐浣滄爲鏄?**`0.2.2-rc.1`**锛岄潰鍚?Harness **`0.2.2-rc.1`**銆俷pm 涓?`latest` 閫氶亾褰撳墠鏄?**`0.1.1`**锛堥潰鍚?`dsh-v0.1.1-rc.2`锛屼笌鏈垎鏀笉鍏煎锛夈€傚洜姝よ鎸変笅闈㈢殑鏂瑰紡浠庢湰鍦?tarball 瀹夎銆?
 ```sh
-# 1. 构建两个包（写入 lib/）并打包成本地 tarball。
-pnpm install
+# 1. 鏋勫缓涓や釜鍖咃紙鍐欏叆 lib/锛夊苟鎵撳寘鎴愭湰鍦?tarball銆?pnpm install
 pnpm -r run bundle
 cd packages/runtime  && pnpm pack --pack-destination ../../release-artifacts && cd ../..
 cd packages/selector && pnpm pack --pack-destination ../../release-artifacts && cd ../..
 ```
 
-这会在 `release-artifacts/` 下生成两个文件：
+杩欎細鍦?`release-artifacts/` 涓嬬敓鎴愪袱涓枃浠讹細
 
 ```
-dsh-context-compression-selector-runtime-0.2.1-rc.5.tgz
-dsh-context-compression-selector-0.2.1-rc.5.tgz
+dsh-context-compression-selector-runtime-0.2.2-rc.1.tgz
+dsh-context-compression-selector-0.2.2-rc.1.tgz
 ```
 
-然后**一起**安装到目标 Profile：
-
+鐒跺悗**涓€璧?*瀹夎鍒扮洰鏍?Profile锛?
 ```sh
 cd ~/.dsh/profiles/<profile>
 
-# 先把 runtime 精确依赖 pin 到本地 tarball（见下方说明，这一步不可省略）
-# 在 pnpm-workspace.yaml 末尾追加：
-#   overrides:
-#     dsh-context-compression-selector-runtime: file:<绝对路径>/release-artifacts/dsh-context-compression-selector-runtime-0.2.1-rc.5.tgz
+# 鍏堟妸 runtime 绮剧‘渚濊禆 pin 鍒版湰鍦?tarball锛堣涓嬫柟璇存槑锛岃繖涓€姝ヤ笉鍙渷鐣ワ級
+# 鍦?pnpm-workspace.yaml 鏈熬杩藉姞锛?#   overrides:
+#     dsh-context-compression-selector-runtime: file:<缁濆璺緞>/release-artifacts/dsh-context-compression-selector-runtime-0.2.2-rc.1.tgz
 
-pnpm add --registry=https://registry.npmmirror.com file:<绝对路径>/release-artifacts/dsh-context-compression-selector-runtime-0.2.1-rc.5.tgz
-pnpm add --registry=https://registry.npmmirror.com file:<绝对路径>/release-artifacts/dsh-context-compression-selector-0.2.1-rc.5.tgz
+pnpm add --registry=https://registry.npmmirror.com file:<缁濆璺緞>/release-artifacts/dsh-context-compression-selector-runtime-0.2.2-rc.1.tgz
+pnpm add --registry=https://registry.npmmirror.com file:<缁濆璺緞>/release-artifacts/dsh-context-compression-selector-0.2.2-rc.1.tgz
 ```
 
-#### 为什么必须写 `overrides`
+#### 涓轰粈涔堝繀椤诲啓 `overrides`
 
-选择器把 runtime 依赖声明为**精确版本**（`"dsh-context-compression-selector-runtime": "0.2.1-rc.5"`）。包管理器每次 `add` 都会重新解析整棵依赖树，于是：
-
-- 只装选择器 tarball → 按**原名**去 registry 找 `0.2.1-rc.5`，而本 fork 发布的不是这个名字 → `ERR_PNPM_NO_MATCHING_VERSION`；
-- **先装 runtime 再装选择器也无效** —— 第二步照样回 registry 解析那个名字，结果相同；
-- 一次传入两个 tarball 也不行 —— pnpm 优先查 registry，不会采用同一命令行里的另一个 tarball。
-
-`overrides` 是把该依赖钉到本地文件的可行做法。它必须写在 profile 的 `pnpm-workspace.yaml` 里：**pnpm 11 已不再读取 `package.json` 的 `pnpm` 字段**（写在里面会打印警告并静默失效）。
-
-真正省事的路径是上面的 GitHub 安装：根 manifest 用 `npm:` 别名把这个名字映射到 `@xbzb404/dsh-context-compression-selector-runtime`，pnpm 会直接从 registry 解析，不需要写 override。
-
-> **注意**：`overrides` 里的路径是**本机绝对路径**，因此不随包分发 —— 每位用户都要按自己的解压位置改一次。
-
-#### 一键脚本（推荐）
-
-本仓库提供 `scripts/install-from-tarballs.mjs`，它会自动完成上面全部步骤（含 override 写入、Bundle 注册与安装后校验），并可用 `--profile` 指定目标：
-
+閫夋嫨鍣ㄦ妸 runtime 渚濊禆澹版槑涓?*绮剧‘鐗堟湰**锛坄"dsh-context-compression-selector-runtime": "0.2.2-rc.1"`锛夈€傚寘绠＄悊鍣ㄦ瘡娆?`add` 閮戒細閲嶆柊瑙ｆ瀽鏁存５渚濊禆鏍戯紝浜庢槸锛?
+- 鍙閫夋嫨鍣?tarball 鈫?鎸?*鍘熷悕**鍘?registry 鎵?`0.2.2-rc.1`锛岃€屾湰 fork 鍙戝竷鐨勪笉鏄繖涓悕瀛?鈫?`ERR_PNPM_NO_MATCHING_VERSION`锛?- **鍏堣 runtime 鍐嶈閫夋嫨鍣ㄤ篃鏃犳晥** 鈥斺€?绗簩姝ョ収鏍峰洖 registry 瑙ｆ瀽閭ｄ釜鍚嶅瓧锛岀粨鏋滅浉鍚岋紱
+- 涓€娆′紶鍏ヤ袱涓?tarball 涔熶笉琛?鈥斺€?pnpm 浼樺厛鏌?registry锛屼笉浼氶噰鐢ㄥ悓涓€鍛戒护琛岄噷鐨勫彟涓€涓?tarball銆?
+`overrides` 鏄妸璇ヤ緷璧栭拤鍒版湰鍦版枃浠剁殑鍙鍋氭硶銆傚畠蹇呴』鍐欏湪 profile 鐨?`pnpm-workspace.yaml` 閲岋細**pnpm 11 宸蹭笉鍐嶈鍙?`package.json` 鐨?`pnpm` 瀛楁**锛堝啓鍦ㄩ噷闈細鎵撳嵃璀﹀憡骞堕潤榛樺け鏁堬級銆?
+鐪熸鐪佷簨鐨勮矾寰勬槸涓婇潰鐨?GitHub 瀹夎锛氭牴 manifest 鐢?`npm:` 鍒悕鎶婅繖涓悕瀛楁槧灏勫埌 `@xbzb404/dsh-context-compression-selector-runtime`锛宲npm 浼氱洿鎺ヤ粠 registry 瑙ｆ瀽锛屼笉闇€瑕佸啓 override銆?
+> **娉ㄦ剰**锛歚overrides` 閲岀殑璺緞鏄?*鏈満缁濆璺緞**锛屽洜姝や笉闅忓寘鍒嗗彂 鈥斺€?姣忎綅鐢ㄦ埛閮借鎸夎嚜宸辩殑瑙ｅ帇浣嶇疆鏀逛竴娆°€?
+#### 涓€閿剼鏈紙鎺ㄨ崘锛?
+鏈粨搴撴彁渚?`scripts/install-from-tarballs.mjs`锛屽畠浼氳嚜鍔ㄥ畬鎴愪笂闈㈠叏閮ㄦ楠わ紙鍚?override 鍐欏叆銆丅undle 娉ㄥ唽涓庡畨瑁呭悗鏍￠獙锛夛紝骞跺彲鐢?`--profile` 鎸囧畾鐩爣锛?
 ```sh
 node scripts/install-from-tarballs.mjs --profile <profile>
 ```
 
-脚本会先备份 `package.json`；失败时可直接从备份回滚。可选参数：`--registry <url>`、`--dry-run`。
+鑴氭湰浼氬厛澶囦唤 `package.json`锛涘け璐ユ椂鍙洿鎺ヤ粠澶囦唤鍥炴粴銆傚彲閫夊弬鏁帮細`--registry <url>`銆乣--dry-run`銆?
+#### `dsh plugin add github:` 杩欐潯璺緞鐜板湪鏄€庝箞閫氱殑
 
-#### `dsh plugin add github:` 这条路径现在是怎么通的
+pnpm 瑙ｆ瀽 git 渚濊禆鐨勮嚜韬緷璧栨椂鍙煡 registry锛屼笉鍋氫粨搴撳唴鐩稿瑙ｆ瀽锛沺npm 10 璧锋洿鏄洿鎺ョ姝?git/URL 褰㈠紡鐨?*瀛愪緷璧?*锛坄ERR_PNPM_EXOTIC_SUBDEP`锛夈€傛墍浠ュ彧鏈変竴澶勫繀椤昏惤鍦?registry锛歳untime 鍖咃紝鐢变綔鑰呭彂甯冨埌鑷繁鐨?scope锛屽啀閫氳繃鏍?manifest 閲岀殑 `npm:` 鍒悕鏄犲皠鍥炲師鍖呭悕銆傚叾浣欓儴鍒嗏€斺€斿涓诲崐銆佹祻瑙堝櫒鍗娿€乸atch 灞傘€佹瀯寤轰骇鐗┾€斺€斿叏閮ㄩ殢 git 妫€鍑轰竴璧蜂笅鍙戯紝鍥犳 `lib/` 蹇呴』淇濇寔鎻愪氦鐘舵€侊紝鐢ㄦ埛鏈満涓嶈窇鏋勫缓銆?
+閲嶅缓 / 閲嶅彂 runtime锛歚node scripts/publish-runtime.mjs`锛堣瘯璺戯級/ `--publish`銆?
+涓嬮潰鐨?tarball 娴佺▼浠嶉€傜敤浜庣绾挎満鍣ㄣ€?
 
-pnpm 解析 git 依赖的自身依赖时只查 registry，不做仓库内相对解析；pnpm 10 起更是直接禁止 git/URL 形式的**子依赖**（`ERR_PNPM_EXOTIC_SUBDEP`）。所以只有一处必须落在 registry：runtime 包，由作者发布到自己的 scope，再通过根 manifest 里的 `npm:` 别名映射回原包名。其余部分——宿主半、浏览器半、patch 层、构建产物——全部随 git 检出一起下发，因此 `lib/` 必须保持提交状态，用户本机不跑构建。
-
-重建 / 重发 runtime：`node scripts/publish-runtime.mjs`（试跑）/ `--publish`。
-
-下面的 tarball 流程仍适用于离线机器。
-
-
-### 上游已发布包（`0.1.1`，面向 `0.1.x` Harness）
-
-> 注意：`dsh-context-compression-selector` 这个 npm 包名属于本仓库所修复的上游项目，`@latest` 装到的是上游构建，不是本仓库的修复版。只在你的 Profile 是 `dsh-v0.1.1-rc.2` 时才考虑使用，且不要与本仓库版本混装：
-
+### 涓婃父宸插彂甯冨寘锛坄0.1.1`锛岄潰鍚?`0.1.x` Harness锛?
+> 娉ㄦ剰锛歚dsh-context-compression-selector` 杩欎釜 npm 鍖呭悕灞炰簬鏈粨搴撴墍淇鐨勪笂娓搁」鐩紝`@latest` 瑁呭埌鐨勬槸涓婃父鏋勫缓锛屼笉鏄湰浠撳簱鐨勪慨澶嶇増銆傚彧鍦ㄤ綘鐨?Profile 鏄?`dsh-v0.1.1-rc.2` 鏃舵墠鑰冭檻浣跨敤锛屼笖涓嶈涓庢湰浠撳簱鐗堟湰娣疯锛?
 ```sh
 dsh plugin --profile <profile> add dsh-context-compression-selector@latest
 dsh --profile <profile> --dump-config
 ```
 
-安装后重启对应 Profile。配置导出中应显示选择器 Bundle 已激活。更新或卸载：
-
+瀹夎鍚庨噸鍚搴?Profile銆傞厤缃鍑轰腑搴旀樉绀洪€夋嫨鍣?Bundle 宸叉縺娲汇€傛洿鏂版垨鍗歌浇锛?
 ```sh
 dsh plugin --profile <profile> up dsh-context-compression-selector@latest
 dsh plugin --profile <profile> remove dsh-context-compression-selector
 ```
 
-选择器包在 manifest 中声明了 Harness Bundle 字段 `dsh.bundle.patch`，因此 `dsh plugin --profile <name> add <package>` 是符合规范的树外 Bundle 安装方式。插件只使用 Harness 的公开扩展 API，不会修改 Harness 核心代码。
+閫夋嫨鍣ㄥ寘鍦?manifest 涓０鏄庝簡 Harness Bundle 瀛楁 `dsh.bundle.patch`锛屽洜姝?`dsh plugin --profile <name> add <package>` 鏄鍚堣鑼冪殑鏍戝 Bundle 瀹夎鏂瑰紡銆傛彃浠跺彧浣跨敤 Harness 鐨勫叕寮€鎵╁睍 API锛屼笉浼氫慨鏀?Harness 鏍稿績浠ｇ爜銆?

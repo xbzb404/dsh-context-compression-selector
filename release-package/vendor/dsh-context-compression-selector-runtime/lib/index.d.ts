@@ -3,7 +3,6 @@ import z from "@deepseek-ai/schemastery";
 import { ContentBlock, ToolCallId } from "@deepseek-ai/dsh-llm";
 import { Session } from "@deepseek-ai/dsh-session";
 import { TokenMeasurement } from "@deepseek-ai/dsh-token-meter";
-//#region src/types.d.ts
 /** User-facing mixed strategy profile. */
 declare const COMPRESSION_PROFILES: readonly ["off", "native", "balanced", "cache-strict", "savings", "adaptive", "custom"];
 /** Public compression strategy selected for one Session. */
@@ -225,8 +224,6 @@ interface PruneResult {
   /** Authoritative exact canonical content tokens removed. */
   readonly tokensRemoved: number;
 }
-//#endregion
-//#region src/custom-policy.d.ts
 /**
  * JSON-survivable union of every Custom document a Host form may carry.
  *
@@ -266,8 +263,6 @@ interface CustomPolicyResolutionOptions {
  * @returns a detached deeply immutable effective token policy.
  */
 declare function resolveCustomPolicy(value: CustomCompressionPolicy, options?: CustomPolicyResolutionOptions): CompressionPolicy;
-//#endregion
-//#region src/config.d.ts
 /** Settings namespace shared by the Host service and browser selector. */
 declare const CONTEXT_COMPRESSION_SETTINGS_NAMESPACE = "context-compression";
 /** Fixed native fallback marker. */
@@ -323,8 +318,6 @@ declare function resolveConfig(config?: ToolResultPruneConfig): ResolvedConfig;
  * @returns the effective deterministic compression policy.
  */
 declare function resolvePolicy(config: ResolvedConfig, profile: CompressionProfile, custom?: CustomCompressionPolicy, options?: CustomPolicyResolutionOptions): CompressionPolicy;
-//#endregion
-//#region src/reducers.d.ts
 /** Deterministic, evidence-backed reducers for fresh tool results. */
 /** Input shared by every fresh-result reducer. */
 interface ReducerInput {
@@ -373,8 +366,6 @@ declare function verifyReduction(input: ReducerInput, output: ReducerOutput): bo
  * @returns normalized terminal text.
  */
 declare function normalizeTerminalText(text: string): string;
-//#endregion
-//#region src/token-count.d.ts
 /** Token counts owned by the standalone compression runtime. */
 /** Exact count of one canonical value under a pinned tokenizer artifact. */
 interface ExactTokenizerTokenCount {
@@ -402,8 +393,6 @@ interface TokenizerEstimateTokenCount {
 }
 /** Exact, conservative request estimate, or an explicit refusal. */
 type TokenCount = ExactTokenizerTokenCount | TokenizerEstimateTokenCount | UnavailableTokenCount;
-//#endregion
-//#region src/measurement.d.ts
 /** Request identity retained only when every dimension is publicly known. */
 interface ProviderMeasurementKey {
   readonly provider: string;
@@ -470,8 +459,6 @@ interface CompactionTokenView extends TokenMeasurement {
  * tokenizer supplies exact canonical content counts used by safe rewrites.
  */
 declare function measureForCompaction(ctx: Context, session: Session): CompactionTokenView;
-//#endregion
-//#region src/index.d.ts
 declare module '@deepseek-ai/cordis' {
   interface Context {
     toolResultPruner: ToolResultPruner;
@@ -577,5 +564,4 @@ declare class ToolResultPruner extends Service {
   private sourceRef;
   private nativePruneContent;
 }
-//#endregion
 export { AUTO_COMPACT_THRESHOLD_LIMITS, type AutoCompactSettings, COMPRESSION_PROFILES, CONTEXT_COMPRESSION_SETTINGS_NAMESPACE, type CompactionTokenView, type CompressionPolicy, type CompressionProfile, type ContextCompressionSettings, ContextCompressionSettingsSchema, type CustomCompressionBudget, type CustomCompressionPolicy, CustomCompressionPolicyInputSchema, CustomCompressionPolicySchema, type CustomCompressionPolicyV1, type CustomCompressionPolicyV2, type CustomCompressionPolicyV3, type CustomCompressionUnit, type CustomHistoryPolicy, type CustomPolicyResolutionOptions, type CustomPrefixPolicy, type CustomTailTrimPolicy, DEFAULTS, DEFAULT_CUSTOM_COMPRESSION_POLICY, type HistoryMode, type MeasuredTokenSurfaceNode, PRUNE_MARKER, type PruneResult, type PruneSessionOptions, type PruneStage, type PrunedEntry, type ResolvedConfig, type ToolResultPruneConfig, ToolResultPruner, ToolResultPruner as default, codePointLength, historicalPlaceholder, isCompressionProfile, isValidAutoCompactThresholdPercent, measureForCompaction, normalizeTerminalText, parseContextCompressionSettings, reduceFreshToolResult, resolveConfig, resolveCustomPolicy, resolvePolicy, verifyReduction };

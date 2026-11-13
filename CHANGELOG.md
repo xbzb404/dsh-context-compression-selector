@@ -2,6 +2,24 @@
 
 All notable changes use this file. The project follows semantic versioning after `0.1.0`.
 
+## 0.2.2-rc.1 - 2026-11-13
+
+### Changed
+
+- **Re-targeted at DeepSeek Harness `0.2.2-rc.1`** (the runtime bundled in Desktop `0.2.2-rc.1`): every `@deepseek-ai` devDependency and peer floor moves to `0.2.2-rc.1`, together with the cordis family `0.2.2` peers on — cordis `4.1.0`, `cordis-plugin-loader` / `cordis-plugin-include` / `cordis-plugin-group` `1.1.0`, and `@deepseek-ai/schemastery` `3.19.0`. `@deepseek-ai/dsh-invariants` stays at `0.2.0-rc.2`: it is still the newest published version (`next` is `0.2.0-rc.2`), and `0.2.2` does not change the `InvariantInstaller` shape this plugin uses.
+- **The peer floors now start at `0.2.2-rc.1`, and that is load-bearing.** This is the same failure mode the `0.2.1-rc.5` release fixed, one minor earlier: pnpm resolves a peer range to the *lowest* satisfying version, so a `>=0.2.1-rc.5` floor installed `@deepseek-ai/dsh-client-ui-slots@0.2.1-rc.5` beside the root's `0.2.2-rc.1`. Two copies of that package means two `SlotMap` / `LocaleNamespaceMap` declaration-merge targets, and the client half stopped type-checking (`'settings.section' does not satisfy the constraint 'never'`) while still shipping a bundle. `scripts/verify-release.mjs` pins the floor so it cannot drift back silently.
+
+### Fixed
+
+- **`@deepseek-ai/cordis` resolved to two instances, so `ctx.invariants` did not exist and the runtime half did not type-check.** `dsh-invariants@0.2.0-rc.2` still declares `@deepseek-ai/cordis: ~4.0.4`, which `4.1.0` does not satisfy, so pnpm materialized both a stale variant and the current one. Cordis carries the ambient `declare module` that merges the `Context` interface, and `dsh-invariants` augments that same interface with `ctx.invariants` — two instances means two unrelated `Context` types, so `invariant.ts` failed with `Property 'invariants' does not exist on type 'Context'` and `InvariantInstaller` stopped being satisfied. `pnpm-workspace.yaml` now pins cordis (and the cordis plugin family, whose own peers were what multiplied the variants) through `overrides`, which is also what production does: the Host resolves a single cordis.
+- **`tools.execute` is a batch call in `0.2.2`, not a single-call one.** `ToolsService.execute` now takes `{ calls, signal, agent? }` and returns `{ results, additionalContexts, concluded }`, with each entry a `{ callId, result }` pair whose `result` carries the `isError` / `content` fields that used to sit on the return value directly. The TailTrim retrieve assertions in `packages/runtime/tests/public/public-runtime.spec.ts` now drive the batch shape.
+- **Tool execution is a separate plugin in `0.2.2`, so a bare `ToolsService` cannot run anything.** The native and PTC executors were split into `@deepseek-ai/dsh-tool-executor-native` / `-ptc`, selected per Agent scope, and `execute()` throws `ToolExecutorUnavailableError` when none is mounted. The retrieve test mounts the native executor (which has no default export — it publishes a plain cordis plugin object) next to `ToolRuntime`.
+- **`Agent` gained a `model` accessor and `agent/pre-step` gained `modelSelection`.** The stub agent in the public spec now implements `model.current()` / `model.select()`, and the pre-step waterfall assertion passes the `modelSelection` the real loop supplies. Neither value is read by the compression code.
+
+### Publishing
+
+- `@xbzb404/dsh-context-compression-selector-runtime@0.2.2-rc.1` is on the public npm registry, and the repository root's alias pin moved with it, so the `github:` install keeps resolving one exact version.
+
 ## 0.2.1-rc.5 - 2026-11-12
 
 ### Changed
