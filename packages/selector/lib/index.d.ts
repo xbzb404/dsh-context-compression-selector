@@ -1,7 +1,6 @@
 import z from "@deepseek-ai/schemastery";
 import { CompressionProfile, CustomCompressionPolicy } from "dsh-context-compression-selector-runtime";
 import { Context } from "@deepseek-ai/cordis";
-//#region src/index.d.ts
 /** Standalone Bundle preferences; the row exposes them through Settings forms. */
 interface Config {
   /** One compression profile, or a fully manual Custom document. */
@@ -27,5 +26,4 @@ declare const Config: z<Config>;
  * leased here anymore, so the Host only publishes the optional preset variants.
  */
 declare function apply(ctx: Context, config?: Config): void;
-//#endregion
 export { Config, apply };

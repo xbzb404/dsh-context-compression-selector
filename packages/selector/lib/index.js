@@ -284,8 +284,7 @@ function renderPatchWarning(message, args) {
 	let index = 0;
 	return `context-compression selector: ${message.replace(/%C/g, () => JSON.stringify(args[index++]))}`;
 }
-//#endregion
-//#region src/index.ts
+// src/index.ts
 /**
 * Mark a field live-editable on the Plugins page.
 *
@@ -457,5 +456,4 @@ function apply(ctx, config = {}) {
 		});
 	});
 }
-//#endregion
 export { Config, apply };

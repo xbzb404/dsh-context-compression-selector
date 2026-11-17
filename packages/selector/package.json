@@ -1,7 +1,7 @@
 {
   "name": "dsh-context-compression-selector",
-  "version": "0.2.2-rc.3",
-  "description": "One-install context-compression selector bundle for DeepSeek Harness",
+  "version": "0.2.2-rc.3.2",
+  "description": "Forked, installable context-compression selector Bundle for DeepSeek Harness 0.2.x",
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -29,7 +29,7 @@
     "LICENSE",
     "THIRD_PARTY_NOTICES.md"
   ],
-    "dsh": {
+  "dsh": {
     "client": {
       "inject": [
         "@deepseek-ai/dsh-client-locale",

@@ -1,6 +1,5 @@
 import { Context } from "@deepseek-ai/cordis";
 import { InjectFace, PropsLocale, PropsRuntime } from "@deepseek-ai/dsh-client-ui-slots";
-//#region src/client/locales.d.ts
 /** Simplified Chinese copy for the context-compression selector. */
 declare const zh: {
   nav: string;
@@ -72,8 +71,6 @@ declare const zh: {
 };
 /** Locale keys that every context-compression selector dictionary must provide. */
 type ContextCompressionLocaleKey = keyof typeof zh;
-//#endregion
-//#region src/profiles.d.ts
 /** Public context-compression choices shared by the Host schema and browser selector. */
 declare const COMPRESSION_PROFILES: readonly ["off", "native", "balanced", "cache-strict", "savings", "adaptive", "custom"];
 /** One supported context-compression profile. */
@@ -145,8 +142,6 @@ interface ContextCompressionSettings {
   /** Auto Compact trigger captured with `profile` when the runtime first observes a Session. */
   autoCompact: AutoCompactSettings;
 }
-//#endregion
-//#region src/client/CompressionProfileSelector.d.ts
 /**
  * Browser view of one compression settings namespace.
  *
@@ -188,9 +183,6 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
     'context-compression': ContextCompressionLocaleKey;
   }
 }
-//#endregion
-//#region src/client/index.d.ts
 declare const inject: string[];
 declare function apply(ctx: Context): void;
-//#endregion
 export { type CompressionProfile, type CompressionProfileSelectorProps, type CompressionSelectorInjected, type CompressionSettingsFace, type CompressionSettingsSnapshot, type ContextCompressionSettings, apply, inject };

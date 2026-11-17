@@ -1,4 +1,4 @@
-//#region src/invariant.ts
+// src/invariant.ts
 const PACKAGE_NAME = "dsh-context-compression-selector";
 /** Cordis companion plugin name. */
 const name = "client-ui-context-compression-selector-invariant";
@@ -16,5 +16,4 @@ const install = () => {};
 * @returns the installed registration's disposer after setup succeeds.
 */
 const apply = (ctx) => Promise.resolve(ctx.invariants.register(PACKAGE_NAME, install));
-//#endregion
 export { apply, inject, name };

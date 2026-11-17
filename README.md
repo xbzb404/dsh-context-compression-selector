@@ -4,29 +4,45 @@
 
 Compatible with: dsh `0.2.2-rc.3` (works on `0.2.x`; tested against DeepSeek Harness Desktop `0.2.2-rc.3`).
 
-[涓枃璇存槑](README.zh.md) 路 [Report an issue](https://github.com/xbzb404/dsh-context-compression-selector/issues)
+[中文说明](README.zh.md) · [Report an issue](https://github.com/xbzb404/dsh-context-compression-selector/issues)
 
 ## Install
 
-One command, installed straight from this repository:
+One command, from npm (the `@xbzb404/` prefix is required):
+
+```sh
+dsh plugin add @xbzb404/dsh-context-compression-selector
+```
+
+The selector layer should be listed in `dsh --dump-config`; restart Harness to apply.
+
+> **Do not install the unscoped name.** `dsh-context-compression-selector` on npm
+> belongs to the upstream project (maintainer `williamshi666`) and is *not* this
+> fork — installing it gets you the original, without these fixes. Only packages
+> under the `@xbzb404/` scope are published from this repository.
+
+The runtime, `@xbzb404/dsh-context-compression-selector-runtime`, resolves as a
+dependency; do not install it separately.
+
+To update or remove it, again with the full scoped name:
+
+```sh
+dsh plugin up @xbzb404/dsh-context-compression-selector
+dsh plugin remove @xbzb404/dsh-context-compression-selector
+```
+
+### Install from the Git repository
+
+To track the newest code in this repository before it is published:
 
 ```sh
 dsh plugin add github:xbzb404/dsh-context-compression-selector
-dsh --dump-config   # the selector layer should be listed
 ```
 
-`dsh plugin add` resolves this repository root as the Bundle: it ships the built
-`packages/selector/lib`, the `cordis.patch.yml` layer, and the browser half, so
-nothing is compiled on your machine. The internal runtime package
-(`dsh-context-compression-selector-runtime`) is the only piece that comes from a
-registry 鈥?pnpm refuses git sub-dependencies 鈥?and it is resolved automatically.
-
-To update or remove it:
-
-```sh
-dsh plugin up dsh-context-compression-selector
-dsh plugin remove dsh-context-compression-selector
-```
+The repository root is itself a Bundle: it ships the built `packages/selector/lib`,
+the `cordis.patch.yml` layer, and the browser half, so nothing is compiled on your
+machine. The runtime is the only piece that comes from a registry — pnpm refuses
+git sub-dependencies — and it resolves from the scope automatically.
 
 For the no-command path (Windows, no Node/npm/account), see below.
 

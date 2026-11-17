@@ -7,7 +7,7 @@ window.__ModuleLoader__.load({
 		let react = require("react");
 		require("@deepseek-ai/dsh-client-ui-primitives");
 		let react_jsx_runtime = require("react/jsx-runtime");
-		//#region \0dsh-context-compression-css:466eb745356d-CompressionProfileSelector.module.css.mjs
+		// \0dsh-context-compression-css:466eb745356d-CompressionProfileSelector.module.css.mjs
 		const css = ".rLocJG_settingsSection{max-width:720px;color:var(--dsw-alias-label-primary);flex-direction:column;gap:12px;display:flex}.rLocJG_settingsTitle{color:var(--dsw-alias-label-primary);margin:0;font-size:16px;font-weight:500;line-height:24px}.rLocJG_settingsDescription{color:var(--dsw-alias-label-tertiary);margin:0;font-size:14px;line-height:22px}.rLocJG_root{width:100%}.rLocJG_profileGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;display:grid}.rLocJG_profileCard{border:1px solid var(--dsw-alias-border-l2);min-height:112px;color:var(--dsw-alias-label-primary);cursor:pointer;text-align:left;background:0 0;border-radius:10px;flex-direction:column;gap:8px;padding:14px;display:flex}.rLocJG_profileCard:hover:not(:disabled){background:var(--dsw-alias-interactive-bg-hover)}.rLocJG_profileCard[aria-pressed=true]{border-color:var(--dsw-alias-label-primary)}.rLocJG_profileCard:active:not(:disabled){transform:scale(.99)}.rLocJG_profileCard:disabled{cursor:default;opacity:.6}.rLocJG_profileCard:focus-visible{outline-offset:2px;outline:2px solid}.rLocJG_profileCardTop{align-items:center;gap:8px;display:flex}.rLocJG_profileCardTitle{font-size:14px;font-weight:500;line-height:20px}.rLocJG_profileCurrent{background:var(--dsw-alias-label-primary);color:var(--dsw-alias-bg-base);border-radius:999px;padding:1px 6px;font-size:10px;line-height:14px}.rLocJG_profileCardDetail{color:var(--dsw-alias-label-secondary);font-size:12px;line-height:18px}.rLocJG_button{border:1px solid var(--dsw-alias-border-l2);width:100%;min-height:34px;color:var(--dsw-alias-label-primary);cursor:pointer;text-align:left;background:0 0;border-radius:10px;align-items:center;gap:8px;padding:6px 8px;display:flex}.rLocJG_button:hover{background:var(--dsw-alias-interactive-bg-hover)}.rLocJG_button:disabled{cursor:default;opacity:.6}.rLocJG_copy{flex:1;min-width:0}.rLocJG_label{color:var(--dsw-alias-label-tertiary);font-size:11px;line-height:14px}.rLocJG_value{text-overflow:ellipsis;white-space:nowrap;font-size:13px;line-height:17px;overflow:hidden}.rLocJG_chevron{color:var(--dsw-alias-label-secondary);flex:none}.rLocJG_menuCopy{flex-direction:column;gap:2px;min-width:220px;display:flex}.rLocJG_menuTitle{font-size:13px;line-height:17px}.rLocJG_menuDetail{white-space:normal;max-width:290px;color:var(--dsw-alias-label-tertiary);font-size:11px;line-height:15px}.rLocJG_error{color:var(--dsw-alias-state-error-primary);padding:4px 8px 0;font-size:11px;line-height:15px}.rLocJG_unavailable{color:var(--dsw-alias-label-tertiary);padding:4px 8px 0;font-size:11px;line-height:15px}.rLocJG_settingsHint{color:var(--dsw-alias-label-secondary);padding:4px 8px 0;font-size:11px;line-height:15px}.rLocJG_pricing{color:var(--dsw-alias-label-tertiary);padding:4px 8px 0;font-size:11px;line-height:15px}.rLocJG_custom{border-top:1px solid var(--dsw-alias-border-l2);margin-top:16px;padding:16px 0 0}.rLocJG_customTitle{margin:0 0 6px;font-size:13px;line-height:17px}.rLocJG_customNote{color:var(--dsw-alias-label-tertiary);margin:4px 0;font-size:11px;line-height:15px}.rLocJG_stage{border:0;border-top:1px solid var(--dsw-alias-border-l2);margin:12px 0 0;padding:12px 0 0}.rLocJG_stageToggle{align-items:center;gap:6px;font-size:12px;line-height:16px;display:inline-flex}.rLocJG_fieldGrid{grid-template-columns:1fr;gap:8px;display:grid}.rLocJG_field{min-width:0;color:var(--dsw-alias-label-secondary);flex-direction:column;gap:4px;margin-top:8px;font-size:11px;line-height:15px;display:flex}.rLocJG_field input,.rLocJG_field select{box-sizing:border-box;border:1px solid var(--dsw-alias-border-l2);background:var(--dsw-alias-bg-base);width:100%;min-width:0;min-height:30px;color:var(--dsw-alias-label-primary);border-radius:7px;padding:4px 6px}.rLocJG_field input:focus-visible,.rLocJG_field select:focus-visible,.rLocJG_actions button:focus-visible{outline-offset:2px;outline:2px solid}.rLocJG_actions{flex-wrap:wrap;gap:8px;margin-top:10px;display:flex}.rLocJG_actions button{border:1px solid var(--dsw-alias-border-l2);min-height:30px;color:var(--dsw-alias-label-primary);background:0 0;border-radius:7px;padding:4px 8px}.rLocJG_actions button:active:not(:disabled){transform:scale(.98)}.rLocJG_actions button:disabled{opacity:.6}@media (width<=560px){.rLocJG_profileGrid{grid-template-columns:1fr}}.rLocJG_autoCompact{border:1px solid #80808059;border-radius:8px;margin-top:24px;padding:16px}.rLocJG_autoCompactTitle{margin:0 0 8px;font-size:15px;font-weight:600}.rLocJG_autoCompactRisk{opacity:.9;margin:8px 0 0;font-size:12px}";
 		const tagId = "dsh-context-compression-selector/CompressionProfileSelector.module.css";
 		if (typeof document !== "undefined" && document.querySelector(`style[data-plugin-css="${tagId}"]`) === null) {
@@ -52,8 +52,7 @@ window.__ModuleLoader__.load({
 			"unavailable": "rLocJG_unavailable",
 			"value": "rLocJG_value"
 		};
-		//#endregion
-		//#region src/profiles.ts
+		// src/profiles.ts
 		/** Public context-compression choices shared by the Host schema and browser selector. */
 		const COMPRESSION_PROFILES = [
 			"off",
@@ -230,8 +229,7 @@ window.__ModuleLoader__.load({
 			const keys = Object.keys(value);
 			return keys.length === expected.length && keys.every((key) => expected.includes(key));
 		}
-		//#endregion
-		//#region src/client/CompressionProfileSelector.tsx
+		// src/client/CompressionProfileSelector.tsx
 		/** Full-page Settings surface backed by the same durable selector state. */
 		function ContextCompressionSettingsSection(props) {
 			return /* @__PURE__ */ (0, react_jsx_runtime.jsx)(SettingsCompressionProfileControls, { ...props });
@@ -702,8 +700,7 @@ window.__ModuleLoader__.load({
 				} : structuredClone(value.tailTrim)
 			};
 		}
-		//#endregion
-		//#region src/client/decode.ts
+		// src/client/decode.ts
 		/** Browser-safe settings decoding shared by the client entry and node tests. */
 		/**
 		* Decode one stored context-compression settings document with exactly the
@@ -726,8 +723,7 @@ window.__ModuleLoader__.load({
 				autoCompact
 			} : void 0;
 		}
-		//#endregion
-		//#region src/client/locales.ts
+		// src/client/locales.ts
 		/** Simplified Chinese copy for the context-compression selector. */
 		const zh = {
 			"nav": "上下文压缩选择器",
@@ -866,8 +862,7 @@ window.__ModuleLoader__.load({
 			"custom.reset": "Reset Custom policy",
 			"custom.invalid": "Custom policy values are invalid."
 		};
-		//#endregion
-		//#region src/client/index.ts
+		// src/client/index.ts
 		const inject = [
 			"slots",
 			"locale",
@@ -964,7 +959,6 @@ window.__ModuleLoader__.load({
 				inject: injected
 			}, ContextCompressionSettingsSection));
 		}
-		//#endregion
 		exports.apply = apply;
 		exports.inject = inject;
 		return module.exports;
