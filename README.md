@@ -2,7 +2,7 @@
 
 > An auditable tool-result context-compression selector for DeepSeek Harness.
 
-Compatible with: dsh `0.2.2-rc.1` (works on `0.2.x`; tested against DeepSeek Harness Desktop `0.2.2-rc.1`).
+Compatible with: dsh `0.2.2-rc.3` (works on `0.2.x`; tested against DeepSeek Harness Desktop `0.2.2-rc.3`).
 
 [涓枃璇存槑](README.zh.md) 路 [Report an issue](https://github.com/xbzb404/dsh-context-compression-selector/issues)
 
@@ -245,9 +245,9 @@ Perfect adaptive behavior requires DeepSeek to expose cache-breakpoint control a
 
 ## Compatibility
 
-- Verified against DeepSeek Harness `0.2.2-rc.1` using public plugin and profile APIs only.
+- Verified against DeepSeek Harness `0.2.2-rc.3` using public plugin and profile APIs only.
 - Requires Node `^22.19.0 || >=24`.
-- **Requires Harness `0.2.2-rc.1`.** This branch is **not** compatible with the `0.1.x` Harness line: the published `0.1.1` releases target `dsh-v0.1.1-rc.2`, while this working tree is ported to the `0.2.2-rc.1` public API surface (`AgentPresetRegistry.register()` preset variants, `SettingsForms.describe()` settings reads, `ConfigForms`-backed `settings.section`, `snapshotEvents()` / `inheritedEventCount` session reads, branded `SessionSeq`, and `Promise<Agent>` from `AgentLoop.create()`). Installing it into a `0.1.x` profile will fail to load.
+- **Requires Harness `0.2.2-rc.3`.** This branch is **not** compatible with the `0.1.x` Harness line: the published `0.1.1` releases target `dsh-v0.1.1-rc.2`, while this working tree is ported to the `0.2.2-rc.3` public API surface (`AgentPresetRegistry.register()` preset variants, `SettingsForms.describe()` settings reads, `ConfigForms`-backed `settings.section`, `snapshotEvents()` / `inheritedEventCount` session reads, branded `SessionSeq`, and `Promise<Agent>` from `AgentLoop.create()`). Installing it into a `0.1.x` profile will fail to load.
 - The project contains only this Bundle and its runtime; it does not vendor or modify DeepSeek Harness core.
 - This is an unofficial community project and is not affiliated with or endorsed by DeepSeek.
 
@@ -289,7 +289,7 @@ dsh plugin --profile <profile> remove dsh-context-compression-selector
 
 ### Install from source (local, unpublished build)
 
-Use this when your Harness profile is on `0.2.2-rc.1` and you need the code in this working tree rather than the published `0.1.1`.
+Use this when your Harness profile is on `0.2.2-rc.3` and you need the code in this working tree rather than the published `0.1.1`.
 
 ```sh
 # 1. Build both packages (writes lib/) and pack them into local tarballs.
@@ -302,8 +302,8 @@ cd packages/selector && pnpm pack --pack-destination ../../release-artifacts && 
 This produces two files in `release-artifacts/`:
 
 ```
-dsh-context-compression-selector-runtime-0.2.2-rc.1.tgz
-dsh-context-compression-selector-0.2.2-rc.1.tgz
+dsh-context-compression-selector-runtime-0.2.2-rc.3.tgz
+dsh-context-compression-selector-0.2.2-rc.3.tgz
 ```
 
 Then install them **together** into the target profile:
@@ -314,17 +314,17 @@ cd ~/.dsh/profiles/<profile>
 # First pin the exact runtime dependency to the local tarball (required 鈥?see below).
 # Append to pnpm-workspace.yaml:
 #   overrides:
-#     dsh-context-compression-selector-runtime: file:<abs-path>/release-artifacts/dsh-context-compression-selector-runtime-0.2.2-rc.1.tgz
+#     dsh-context-compression-selector-runtime: file:<abs-path>/release-artifacts/dsh-context-compression-selector-runtime-0.2.2-rc.3.tgz
 
-pnpm add --registry=https://registry.npmmirror.com file:<abs-path>/release-artifacts/dsh-context-compression-selector-runtime-0.2.2-rc.1.tgz
-pnpm add --registry=https://registry.npmmirror.com file:<abs-path>/release-artifacts/dsh-context-compression-selector-0.2.2-rc.1.tgz
+pnpm add --registry=https://registry.npmmirror.com file:<abs-path>/release-artifacts/dsh-context-compression-selector-runtime-0.2.2-rc.3.tgz
+pnpm add --registry=https://registry.npmmirror.com file:<abs-path>/release-artifacts/dsh-context-compression-selector-0.2.2-rc.3.tgz
 ```
 
 #### Why the `overrides` entry is required
 
-The selector declares its runtime dependency as an **exact** version (`"dsh-context-compression-selector-runtime": "0.2.2-rc.1"`). The package manager re-resolves the whole dependency tree on every `add`, so:
+The selector declares its runtime dependency as an **exact** version (`"dsh-context-compression-selector-runtime": "0.2.2-rc.3"`). The package manager re-resolves the whole dependency tree on every `add`, so:
 
-- installing only the selector tarball looks up `0.2.2-rc.1` under the **plain** name, which is not what this fork publishes 鈫?`ERR_PNPM_NO_MATCHING_VERSION`;
+- installing only the selector tarball looks up `0.2.2-rc.3` under the **plain** name, which is not what this fork publishes 鈫?`ERR_PNPM_NO_MATCHING_VERSION`;
 - **installing the runtime first does not help** 鈥?the second `add` still re-resolves that exact name against the registry, with the same result;
 - passing both tarballs in one command does not work either 鈥?pnpm prefers the registry and will not adopt the sibling tarball from the same invocation.
 

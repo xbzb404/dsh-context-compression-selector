@@ -99,12 +99,18 @@ for (const [name, manifest] of [
   if (manifest.publishConfig?.access !== 'public') fail(`${name} publish access is not public`)
   if (manifest.publishConfig?.tag !== 'latest') fail(`${name} publish tag is not latest`)
 }
+// The peer floor must track the release series the plugin is built against:
+// resolving against an earlier 0.2.2 prerelease would silently pair this code
+// with a surface it does not match. Derive the expected range from the
+// package's own version so a release bump cannot leave the gate checking a
+// stale literal.
+const verifiedPeerRange = `>=${selectorPackage.version} <0.3.0`
 for (const peer of [
   '@deepseek-ai/dsh-command-compact',
   '@deepseek-ai/dsh-compaction-basic',
 ]) {
-  if (selectorPackage.peerDependencies?.[peer] !== '>=0.2.2-rc.1 <0.3.0') {
-    fail(`selector peer ${peer} is missing or outside the verified range`)
+  if (selectorPackage.peerDependencies?.[peer] !== verifiedPeerRange) {
+    fail(`selector peer ${peer} is missing or outside the verified range (expected ${verifiedPeerRange})`)
   }
 }
 for (const packageRoot of [join(root, 'packages/runtime'), join(root, 'packages/selector')]) {

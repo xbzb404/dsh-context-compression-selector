@@ -145,10 +145,8 @@ describe('parent/child prefix behavior (keyless full-loop E2E)', () => {
     const forkRun = await ctx.subagents.startActivation({
       provider: 'fork',
       label: 'cache-fork',
-      request: {
-        prompt: [{ type: 'text', text: CHILD_TEXT }],
-        parent,
-      },
+      prompt: [{ type: 'text', text: CHILD_TEXT }],
+      parent,
       signal: new AbortController().signal,
       delivery: 'caller',
     })
@@ -173,10 +171,8 @@ describe('parent/child prefix behavior (keyless full-loop E2E)', () => {
     const spawnRun = await ctx.subagents.startActivation({
       provider: 'spawn',
       label: 'cache-spawn',
-      request: {
-        prompt: [{ type: 'text', text: SPAWN_TEXT }],
-        parent,
-      },
+      prompt: [{ type: 'text', text: SPAWN_TEXT }],
+      parent,
       signal: new AbortController().signal,
       delivery: 'caller',
     })
@@ -223,10 +219,8 @@ describe.skipIf(!process.env.DEEPSEEK_API_KEY)('parent/child natural cache-prefi
     const forkRun = await ctx.subagents.startActivation({
       provider: 'fork',
       label: 'cache-fork-live',
-      request: {
-        prompt: [{ type: 'text', text: CHILD_TEXT }],
-        parent,
-      },
+      prompt: [{ type: 'text', text: CHILD_TEXT }],
+      parent,
       signal: new AbortController().signal,
       delivery: 'caller',
     })
@@ -281,10 +275,8 @@ describe.skipIf(!process.env.DEEPSEEK_API_KEY)('parent/child natural cache-prefi
     const spawnRun = await ctx.subagents.startActivation({
       provider: 'spawn',
       label: 'cache-spawn-live',
-      request: {
-        prompt: [{ type: 'text', text: SPAWN_TEXT }],
-        parent,
-      },
+      prompt: [{ type: 'text', text: SPAWN_TEXT }],
+      parent,
       signal: new AbortController().signal,
       delivery: 'caller',
     })

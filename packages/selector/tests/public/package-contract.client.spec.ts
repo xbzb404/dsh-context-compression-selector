@@ -24,10 +24,13 @@ describe('standalone package contract', () => {
     expect(selector.dependencies?.['dsh-context-compression-selector-runtime']).toBe(runtime.version)
     expect(runtime.dependencies?.['@huggingface/tokenizers']).toBe('0.1.3')
     expect(Object.keys(selector.peerDependencies ?? {})).not.toContain('@deepseek-ai/dsh-compaction-tool-result-pruner')
-    expect(selector.peerDependencies?.['@deepseek-ai/dsh-compaction-basic'])
-      .toBe('>=0.2.2-rc.1 <0.3.0')
-    expect(selector.peerDependencies?.['@deepseek-ai/dsh-command-compact'])
-      .toBe('>=0.2.2-rc.1 <0.3.0')
+    // The peer floor tracks the release series: a plugin built against 0.2.2
+    // must not resolve against an earlier 0.2.2 prerelease whose surface it
+    // does not match. Deriving it from `version` keeps that invariant checked
+    // without a second place to bump on every release.
+    const floor = `>=${selector.version} <0.3.0`
+    expect(selector.peerDependencies?.['@deepseek-ai/dsh-compaction-basic']).toBe(floor)
+    expect(selector.peerDependencies?.['@deepseek-ai/dsh-command-compact']).toBe(floor)
     expect(selector.publishConfig?.tag).toBe('latest')
     expect(runtime.publishConfig?.tag).toBe('latest')
   })

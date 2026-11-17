@@ -2,6 +2,25 @@
 
 All notable changes use this file. The project follows semantic versioning after `0.1.0`.
 
+## 0.2.2-rc.3 - 2026-11-17
+
+### Changed
+
+- **Re-targeted at DeepSeek Harness `0.2.2-rc.3`** (the runtime bundled in Desktop `0.2.2-rc.3`): every `@deepseek-ai` devDependency and peer floor moves from `0.2.2-rc.1` to `0.2.2-rc.3`. The cordis family pins are unchanged 鈥?cordis `4.1.0`, `cordis-plugin-loader` / `-include` / `-group` `1.1.0`, `@deepseek-ai/schemastery` `3.19.0` 鈥?because `0.2.2-rc.3` still ships that same generation. `@deepseek-ai/dsh-invariants` also stays at `0.2.0-rc.2`: it is still the newest published version, and nothing between `rc.1` and `rc.3` changes the `InvariantInstaller` shape this plugin uses.
+- **The peer floors now start at `0.2.2-rc.3`.** Same load-bearing reason as every previous release: pnpm resolves a peer range to the *lowest* satisfying version, so a stale floor installs an older `@deepseek-ai/dsh-client-ui-slots` beside the root and splits the `SlotMap` / `LocaleNamespaceMap` declaration-merge targets. `scripts/verify-release.mjs` and `packages/selector/tests/public/package-contract.client.spec.ts` both used to pin the literal `0.2.2-rc.1`; they now **derive** the expected floor from the package's own `version`, so a release bump can no longer leave a gate checking a stale string while the invariant silently stops being enforced.
+
+### Fixed
+
+- **The keyless parent/child cache-prefix E2E no longer compiles against `rc.2`+.** `SubagentActivationSpec` stopped accepting a nested `request` object and now takes the task options directly, so the spec passes `prompt` and `parent` as top-level fields. This is the `subagent-activation-options` break; the runtime code was unaffected because it does not start activations.
+
+### Verified
+
+- `pnpm run typecheck`, `pnpm run test` (520 passed, 1 skipped), `pnpm run test:built`, and `pnpm run verify:release` all pass against the `0.2.2-rc.3` packages.
+
+### Publishing
+
+- `@xbzb404/dsh-context-compression-selector-runtime@0.2.2-rc.3` is published to the public npm registry, and the repository root's alias pin moved with it, so the `github:` install keeps resolving one exact version.
+
 ## 0.2.2-rc.1 - 2026-11-13
 
 ### Changed

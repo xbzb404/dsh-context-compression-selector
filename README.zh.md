@@ -1,7 +1,7 @@
 # dsh-context-compression-selector
 
 > 闈㈠悜 DeepSeek Harness 鐨勩€佸彲瀹¤鐨勫伐鍏风粨鏋滀笂涓嬫枃鍘嬬缉閫夋嫨鍣ㄣ€?
-Compatible with: dsh `0.2.2-rc.1`锛堥€傞厤 `0.2.x`锛屽凡鍦?DeepSeek Harness 妗岄潰绔?`0.2.2-rc.1` 瀹炴祴锛夈€?
+Compatible with: dsh `0.2.2-rc.3`锛堥€傞厤 `0.2.x`锛屽凡鍦?DeepSeek Harness 妗岄潰绔?`0.2.2-rc.3` 瀹炴祴锛夈€?
 [English README](README.md) 路 [鎻愪氦闂](https://github.com/xbzb404/dsh-context-compression-selector/issues)
 
 ## 瀹夎
@@ -175,7 +175,7 @@ History 浼氫繚鎶も€滄渶杩?10 娆?Agent 宸ュ叿璋冪敤鈥濆拰鈥�
 Adaptive 鍦ㄨ缃晫闈腑鏄剧ず涓?*淇濆畧鎴愭湰**銆傚畠鐩墠鏈夋剰涓嶆槸涓€涓畬缇庣殑鑷€傚簲缂撳瓨浼樺寲鍣細瀹冧緷鎹綋鍓嶅彲寰楃殑璇锋眰 usage銆佹ā鍨嬩环鏍煎拰鍚屼竴 tokenizer 鐨勬祴閲忕粨鏋滀綔淇濆畧浼扮畻锛涜繖浜涜緭鍏ヤ笉瀹屾暣鏃朵細瀹夊叏闄嶇骇銆傚畠鏃犳硶瑙傚療鎴栨帶鍒剁簿纭殑缂撳瓨鏂偣銆佺紦瀛樺垎閰嶅拰缂撳瓨瀛樻椿鏃堕棿銆?
 瑕佸疄鐜板畬缇庣殑 Adaptive锛岄渶瑕?DeepSeek 鎻愪緵缂撳瓨鏂偣鎺у埗锛屼互鍙婄紦瀛?TTL/瀛樻椿鏃堕棿璇佹嵁銆傝繖浜涜兘鍔涚洰鍓嶆病鏈夐€氳繃 DeepSeek Harness 鎴栨彁渚涘晢鍏紑 API 鎻愪緵缁欐湰鎻掍欢銆備笂娓歌兘鍔涜姹傦細@deepseek-ai 鍜?[deepseek-ai/deepseek-harness](https://github.com/deepseek-ai/deepseek-harness)銆?
 ## 鍏煎鎬?
-- 宸插熀浜?DeepSeek Harness `0.2.2-rc.1` 楠岃瘉锛屽苟涓斿彧浣跨敤鍏紑鐨勬彃浠朵笌 Profile API銆?- 闇€瑕?Node `^22.19.0 || >=24`銆?- **瑕佹眰 Harness `0.2.2-rc.1`銆?* 鏈垎鏀笌 `0.1.x` Harness 浜у搧绾?*涓嶅吋瀹?*锛氬凡鍙戝竷鐨?`0.1.1` 闈㈠悜 `dsh-v0.1.1-rc.2`锛岃€屾湰宸ヤ綔鏍戝凡杩佺Щ鍒?`0.2.2-rc.1` 鐨勫叕寮€ API 闈紙`AgentPresetRegistry.register()` 棰勮鍙樹綋銆乣SettingsForms.describe()` 璁剧疆璇诲彇銆乣ConfigForms` 椹卞姩鐨?`settings.section`銆乣snapshotEvents()` / `inheritedEventCount` 浼氳瘽璇诲彇銆佸甫鍝佺墝鐨?`SessionSeq`锛屼互鍙?`AgentLoop.create()` 杩斿洖 `Promise<Agent>`锛夈€傝杩?`0.1.x` Profile 浼氬姞杞藉け璐ャ€?- 鏈」鐩彧鍖呭惈璇?Bundle 涓?runtime锛屼笉 vendoring 鎴栦慨鏀?DeepSeek Harness 鏍稿績銆?- 杩欐槸闈炲畼鏂圭ぞ鍖洪」鐩紝涓?DeepSeek 涓嶅瓨鍦ㄩ毝灞炴垨鑳屼功鍏崇郴銆?
+- 宸插熀浜?DeepSeek Harness `0.2.2-rc.3` 楠岃瘉锛屽苟涓斿彧浣跨敤鍏紑鐨勬彃浠朵笌 Profile API銆?- 闇€瑕?Node `^22.19.0 || >=24`銆?- **瑕佹眰 Harness `0.2.2-rc.3`銆?* 鏈垎鏀笌 `0.1.x` Harness 浜у搧绾?*涓嶅吋瀹?*锛氬凡鍙戝竷鐨?`0.1.1` 闈㈠悜 `dsh-v0.1.1-rc.2`锛岃€屾湰宸ヤ綔鏍戝凡杩佺Щ鍒?`0.2.2-rc.3` 鐨勫叕寮€ API 闈紙`AgentPresetRegistry.register()` 棰勮鍙樹綋銆乣SettingsForms.describe()` 璁剧疆璇诲彇銆乣ConfigForms` 椹卞姩鐨?`settings.section`銆乣snapshotEvents()` / `inheritedEventCount` 浼氳瘽璇诲彇銆佸甫鍝佺墝鐨?`SessionSeq`锛屼互鍙?`AgentLoop.create()` 杩斿洖 `Promise<Agent>`锛夈€傝杩?`0.1.x` Profile 浼氬姞杞藉け璐ャ€?- 鏈」鐩彧鍖呭惈璇?Bundle 涓?runtime锛屼笉 vendoring 鎴栦慨鏀?DeepSeek Harness 鏍稿績銆?- 杩欐槸闈炲畼鏂圭ぞ鍖洪」鐩紝涓?DeepSeek 涓嶅瓨鍦ㄩ毝灞炴垨鑳屼功鍏崇郴銆?
 ## 寮€鍙戜笌瀹夊叏
 
 鍙娇鐢ㄤ互涓嬪懡浠よ繍琛岄潰鍚戝彂甯冪殑鏈湴妫€鏌ワ細
@@ -193,7 +193,7 @@ pnpm run verify:release
 
 ### 浠庢簮鐮佸畨瑁咃紙鏈湴鏈彂甯冩瀯寤猴級
 
-鏈伐浣滄爲鏄?**`0.2.2-rc.1`**锛岄潰鍚?Harness **`0.2.2-rc.1`**銆俷pm 涓?`latest` 閫氶亾褰撳墠鏄?**`0.1.1`**锛堥潰鍚?`dsh-v0.1.1-rc.2`锛屼笌鏈垎鏀笉鍏煎锛夈€傚洜姝よ鎸変笅闈㈢殑鏂瑰紡浠庢湰鍦?tarball 瀹夎銆?
+鏈伐浣滄爲鏄?**`0.2.2-rc.3`**锛岄潰鍚?Harness **`0.2.2-rc.3`**銆俷pm 涓?`latest` 閫氶亾褰撳墠鏄?**`0.1.1`**锛堥潰鍚?`dsh-v0.1.1-rc.2`锛屼笌鏈垎鏀笉鍏煎锛夈€傚洜姝よ鎸変笅闈㈢殑鏂瑰紡浠庢湰鍦?tarball 瀹夎銆?
 ```sh
 # 1. 鏋勫缓涓や釜鍖咃紙鍐欏叆 lib/锛夊苟鎵撳寘鎴愭湰鍦?tarball銆?pnpm install
 pnpm -r run bundle
@@ -204,8 +204,8 @@ cd packages/selector && pnpm pack --pack-destination ../../release-artifacts && 
 杩欎細鍦?`release-artifacts/` 涓嬬敓鎴愪袱涓枃浠讹細
 
 ```
-dsh-context-compression-selector-runtime-0.2.2-rc.1.tgz
-dsh-context-compression-selector-0.2.2-rc.1.tgz
+dsh-context-compression-selector-runtime-0.2.2-rc.3.tgz
+dsh-context-compression-selector-0.2.2-rc.3.tgz
 ```
 
 鐒跺悗**涓€璧?*瀹夎鍒扮洰鏍?Profile锛?
@@ -214,16 +214,16 @@ cd ~/.dsh/profiles/<profile>
 
 # 鍏堟妸 runtime 绮剧‘渚濊禆 pin 鍒版湰鍦?tarball锛堣涓嬫柟璇存槑锛岃繖涓€姝ヤ笉鍙渷鐣ワ級
 # 鍦?pnpm-workspace.yaml 鏈熬杩藉姞锛?#   overrides:
-#     dsh-context-compression-selector-runtime: file:<缁濆璺緞>/release-artifacts/dsh-context-compression-selector-runtime-0.2.2-rc.1.tgz
+#     dsh-context-compression-selector-runtime: file:<缁濆璺緞>/release-artifacts/dsh-context-compression-selector-runtime-0.2.2-rc.3.tgz
 
-pnpm add --registry=https://registry.npmmirror.com file:<缁濆璺緞>/release-artifacts/dsh-context-compression-selector-runtime-0.2.2-rc.1.tgz
-pnpm add --registry=https://registry.npmmirror.com file:<缁濆璺緞>/release-artifacts/dsh-context-compression-selector-0.2.2-rc.1.tgz
+pnpm add --registry=https://registry.npmmirror.com file:<缁濆璺緞>/release-artifacts/dsh-context-compression-selector-runtime-0.2.2-rc.3.tgz
+pnpm add --registry=https://registry.npmmirror.com file:<缁濆璺緞>/release-artifacts/dsh-context-compression-selector-0.2.2-rc.3.tgz
 ```
 
 #### 涓轰粈涔堝繀椤诲啓 `overrides`
 
-閫夋嫨鍣ㄦ妸 runtime 渚濊禆澹版槑涓?*绮剧‘鐗堟湰**锛坄"dsh-context-compression-selector-runtime": "0.2.2-rc.1"`锛夈€傚寘绠＄悊鍣ㄦ瘡娆?`add` 閮戒細閲嶆柊瑙ｆ瀽鏁存５渚濊禆鏍戯紝浜庢槸锛?
-- 鍙閫夋嫨鍣?tarball 鈫?鎸?*鍘熷悕**鍘?registry 鎵?`0.2.2-rc.1`锛岃€屾湰 fork 鍙戝竷鐨勪笉鏄繖涓悕瀛?鈫?`ERR_PNPM_NO_MATCHING_VERSION`锛?- **鍏堣 runtime 鍐嶈閫夋嫨鍣ㄤ篃鏃犳晥** 鈥斺€?绗簩姝ョ収鏍峰洖 registry 瑙ｆ瀽閭ｄ釜鍚嶅瓧锛岀粨鏋滅浉鍚岋紱
+閫夋嫨鍣ㄦ妸 runtime 渚濊禆澹版槑涓?*绮剧‘鐗堟湰**锛坄"dsh-context-compression-selector-runtime": "0.2.2-rc.3"`锛夈€傚寘绠＄悊鍣ㄦ瘡娆?`add` 閮戒細閲嶆柊瑙ｆ瀽鏁存５渚濊禆鏍戯紝浜庢槸锛?
+- 鍙閫夋嫨鍣?tarball 鈫?鎸?*鍘熷悕**鍘?registry 鎵?`0.2.2-rc.3`锛岃€屾湰 fork 鍙戝竷鐨勪笉鏄繖涓悕瀛?鈫?`ERR_PNPM_NO_MATCHING_VERSION`锛?- **鍏堣 runtime 鍐嶈閫夋嫨鍣ㄤ篃鏃犳晥** 鈥斺€?绗簩姝ョ収鏍峰洖 registry 瑙ｆ瀽閭ｄ釜鍚嶅瓧锛岀粨鏋滅浉鍚岋紱
 - 涓€娆′紶鍏ヤ袱涓?tarball 涔熶笉琛?鈥斺€?pnpm 浼樺厛鏌?registry锛屼笉浼氶噰鐢ㄥ悓涓€鍛戒护琛岄噷鐨勫彟涓€涓?tarball銆?
 `overrides` 鏄妸璇ヤ緷璧栭拤鍒版湰鍦版枃浠剁殑鍙鍋氭硶銆傚畠蹇呴』鍐欏湪 profile 鐨?`pnpm-workspace.yaml` 閲岋細**pnpm 11 宸蹭笉鍐嶈鍙?`package.json` 鐨?`pnpm` 瀛楁**锛堝啓鍦ㄩ噷闈細鎵撳嵃璀﹀憡骞堕潤榛樺け鏁堬級銆?
 鐪熸鐪佷簨鐨勮矾寰勬槸涓婇潰鐨?GitHub 瀹夎锛氭牴 manifest 鐢?`npm:` 鍒悕鎶婅繖涓悕瀛楁槧灏勫埌 `@xbzb404/dsh-context-compression-selector-runtime`锛宲npm 浼氱洿鎺ヤ粠 registry 瑙ｆ瀽锛屼笉闇€瑕佸啓 override銆?
