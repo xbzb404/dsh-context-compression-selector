@@ -281,7 +281,7 @@ pnpm run verify:release
 
 ### 从源码安装（本地未发布构建）
 
-本工作树是 **`0.2.2-rc.3`**，面向 Harness **`0.2.2-rc.3`**。npm 上 `latest` 通道当前是 **`0.1.1`**（面向 `dsh-v0.1.1-rc.2`，与本分支不兼容）。因此请按下面的方式从本地 tarball 安装。
+用于需要完全离线构建、且不走 npm 的场景。
 
 ```sh
 # 1. 构建两个包（写入 lib/）并打包成本地 tarball。
@@ -344,21 +344,14 @@ pnpm 解析 git 依赖的自身依赖时只查 registry，不做仓库内相对�
 
 下面的 tarball 流程仍适用于离线机器。
 
+### 关于 npm 上不带前缀的包
 
-### 上游已发布包（`0.1.1`，面向 `0.1.x` Harness）
+`dsh-context-compression-selector` 与 `dsh-context-compression-selector-runtime`
+这两个**不带前缀**的 npm 包名属于本仓库所修复的上游项目（维护者 `williamshi666`），
+`@latest` 装到的是上游面向 `0.1.x` Harness 的构建，**不是**本 fork 的修复版。
+只有 `@xbzb404/` scope 下的包由本仓库发布。
 
-> 注意：`dsh-context-compression-selector` 这个 npm 包名属于本仓库所修复的上游项目，`@latest` 装到的是上游构建，不是本仓库的修复版。只在你的 Profile 是 `dsh-v0.1.1-rc.2` 时才考虑使用，且不要与本仓库版本混装：
-
-```sh
-dsh plugin --profile <profile> add dsh-context-compression-selector@latest
-dsh --profile <profile> --dump-config
-```
-
-安装后重启对应 Profile。配置导出中应显示选择器 Bundle 已激活。更新或卸载：
-
-```sh
-dsh plugin --profile <profile> up dsh-context-compression-selector@latest
-dsh plugin --profile <profile> remove dsh-context-compression-selector
-```
+因此不要执行 `dsh plugin add dsh-context-compression-selector@latest` —— 那会装进一个
+与本 Harness 版本不兼容的原版。请用本 README 顶部的带前缀命令，或上面的 GitHub 安装。
 
 选择器包在 manifest 中声明了 Harness Bundle 字段 `dsh.bundle.patch`，因此 `dsh plugin --profile <name> add <package>` 是符合规范的树外 Bundle 安装方式。插件只使用 Harness 的公开扩展 API，不会修改 Harness 核心代码。

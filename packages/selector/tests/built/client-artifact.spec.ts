@@ -3,6 +3,10 @@ import { resolve } from 'node:path'
 import * as React from 'react'
 import * as jsxRuntime from 'react/jsx-runtime'
 import { describe, expect, it } from 'vitest'
+import {
+  clientRegistrationId,
+  retargetClientRegistrationId,
+} from '../../../../scripts/lib/selector-identity.mjs'
 
 const artifact = resolve(import.meta.dirname, '../../lib/client.js')
 
@@ -49,5 +53,44 @@ describe('built Harness client artifact', () => {
     expect(code).not.toMatch(/^\s*(?:import|export)\s/mu)
     expect(code).not.toMatch(/(?:\/home\/|[A-Za-z]:\\Users\\)/u)
     expect(code).not.toContain('sourceMappingURL')
+  })
+})
+
+// The Host accepts a client registration only under the resolved manifest
+// package name. The tracked artifact is served as-is to a `github:` install, so
+// it must announce the workspace name; the npm tarball announces the scoped one.
+// Both halves of that pair are asserted here, because the failure they guard is
+// silent in the build and loud only in the user's browser.
+describe('client registration identity', () => {
+  const code = readFileSync(artifact, 'utf8')
+
+  it('announces the unscoped workspace package name', () => {
+    expect(clientRegistrationId(code)).toBe('dsh-context-compression-selector')
+  })
+
+  it('re-targets the scoped name for the published tarball', () => {
+    const scoped = '@xbzb404/dsh-context-compression-selector'
+    const retargeted = retargetClientRegistrationId(
+      code,
+      'dsh-context-compression-selector',
+      scoped,
+    )
+    expect(clientRegistrationId(retargeted)).toBe(scoped)
+    // Only the banner id moves. The CSS tag id, `dataset.plugin`, and the
+    // settings entry id carry related names and must not be rewritten.
+    expect(retargeted).toContain('const tagId = "dsh-context-compression-selector/CompressionProfileSelector.module.css";')
+    expect(retargeted).toContain('"context-compression"')
+    expect(retargeted.length).toBe(code.length + scoped.length - 'dsh-context-compression-selector'.length)
+  })
+
+  it('refuses to re-target a banner that carries an unexpected id', () => {
+    // A silent no-op here is the whole bug: the tarball ships, installs, and
+    // then never registers. The helper must throw instead.
+    expect(() => retargetClientRegistrationId(code, 'some-other-package', '@xbzb404/x')).toThrow(
+      /cannot be re-targeted/u,
+    )
+    expect(() => retargetClientRegistrationId('window.__ModuleLoader__.load({})', 'a', 'b')).toThrow(
+      /does not open with a __ModuleLoader__\.load/u,
+    )
   })
 })

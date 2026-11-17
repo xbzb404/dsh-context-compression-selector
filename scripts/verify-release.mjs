@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto'
 import { readdir, readFile, stat } from 'node:fs/promises'
 import { join, relative } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { clientRegistrationId } from './lib/selector-identity.mjs'
 
 const root = fileURLToPath(new URL('..', import.meta.url))
 
@@ -201,6 +202,22 @@ for (const packageRoot of [join(root, 'packages/runtime'), join(root, 'packages/
 const clientArtifact = await readFile(join(root, 'packages/selector/lib/client.js'), 'utf8')
 if (!clientArtifact.startsWith('window.__ModuleLoader__.load({')) {
   fail('client.js is not a Harness lazy-CJS artifact')
+}
+// The tracked artifact is what a `github:` install serves and no build runs
+// there, so its registration id must be the workspace manifest name. The
+// publish script re-targets the staged copy at the scoped name; if this side
+// drifts, one of the two install shapes stops registering and its settings
+// section silently disappears in the browser.
+const artifactClientId = clientRegistrationId(clientArtifact)
+if (artifactClientId !== selectorPackage.name) {
+  fail(
+    `packages/selector/lib/client.js registers "${String(artifactClientId)}", but the workspace\n` +
+      `  package is "${selectorPackage.name}". A git install resolves the latter, so the\n` +
+      `  bundle would fail with "loaded without registering". Rebuild: pnpm -r run bundle.`,
+  )
+}
+if (!/^\s*-\s*insert:/mu.test(await readFile(join(root, 'packages/selector/cordis.patch.yml'), 'utf8'))) {
+  fail('cordis.patch.yml has no insert layer')
 }
 if (!clientArtifact.includes('data-plugin-css') || !clientArtifact.includes('document.head.appendChild(tag)')) {
   fail('client.js does not contain its tagged CSS injection')

@@ -15,10 +15,27 @@
  *     resolves when a user installs this package. It points at the scoped
  *     runtime, which IS published.
  *
- * `dsh.bundle.patch` and the patch layer's own `name:` field stay pointed at the
- * package name a Host resolves, which is the scoped name once installed — so the
- * patch keeps naming `dsh-context-compression-selector`, the module id the Host
- * loads. Renaming that would orphan the row.
+ * Three names change in the staged tarball and all of them matter:
+ *
+ *   - `name`, because npm publishes under the name in the packed manifest.
+ *   - the `dependencies` entry for the runtime, because that is what npm
+ *     resolves when a user installs this package. It points at the scoped
+ *     runtime, which IS published.
+ *   - `name:` in the Bundle patch layer, which is the module id the Host
+ *     imports, not a label.
+ *
+ * The fourth is the client half. `lib/client.js` opens with
+ * `window.__ModuleLoader__.load({ id })`, and the Host only accepts that
+ * registration when `id` equals the resolved manifest package name — so the
+ * scoped tarball's client must register the scoped name. The tracked artifact
+ * keeps the unscoped workspace id (a `github:` install resolves that name and
+ * runs no build), which means the same re-target that fixes the patch has to
+ * run on the staged client too. Skipping it installs cleanly and then fails in
+ * the browser with "loaded without registering ... via __ModuleLoader__.load",
+ * which presents as the settings page silently disappearing.
+ *
+ * The patch layer's own `name:` is the module id the Host imports; renaming it
+ * without the client id (or the reverse) breaks the pair.
  *
  * Usage:
  *   node scripts/publish-selector.mjs            # stage only, prints what would be published
@@ -30,6 +47,7 @@ import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { clientRegistrationId, retargetClientRegistrationId } from './lib/selector-identity.mjs'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const SELECTOR_DIR = join(ROOT, 'packages/selector')
@@ -98,6 +116,29 @@ if (!patchedForPublish.includes(`'${publishedName}'`)) {
   )
 }
 await writeFile(join(STAGE, 'cordis.patch.yml'), patchedForPublish)
+
+// The client half carries the same identity. Its banner id must equal the
+// package name the Host resolved, or the registration is rejected in the
+// browser and the plugin never contributes its settings section.
+const clientSource = await readFile(join(STAGE, 'lib/client.js'), 'utf8')
+let patchedClient
+try {
+  patchedClient = retargetClientRegistrationId(clientSource, unscoped, publishedName)
+} catch (error) {
+  fail(error instanceof Error ? error.message : String(error))
+}
+await writeFile(join(STAGE, 'lib/client.js'), patchedClient)
+
+// Fail closed on the exact condition the Host rejects. Reading the staged bytes
+// back proves the file on disk — not the string in memory — carries the id npm
+// will serve.
+const stagedClientId = clientRegistrationId(await readFile(join(STAGE, 'lib/client.js'), 'utf8'))
+if (stagedClientId !== publishedName) {
+  fail(
+    `staged lib/client.js registers "${String(stagedClientId)}" instead of "${publishedName}".\n` +
+      `  The Host accepts a client registration only under its resolved manifest name.`,
+  )
+}
 
 /** The staged manifest: same payload, scoped identity, scoped runtime dependency. */
 const staged = {

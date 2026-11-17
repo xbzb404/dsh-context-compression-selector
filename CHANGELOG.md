@@ -2,6 +2,27 @@
 
 All notable changes use this file. The project follows semantic versioning after `0.1.0`.
 
+## 0.2.2-rc.3.4 - 2026-11-17
+
+### Fixed
+
+- **The npm tarball registered its browser half under the wrong module id, so the settings page disappeared once installed.** `lib/client.js` opens with `window.__ModuleLoader__.load({ id })`, and the Harness accepts that registration only when `id` equals the **resolved manifest package name** it just fetched. The tracked artifact bakes the unscoped workspace name (`dsh-context-compression-selector`) — correct for a `github:` install, which serves that same manifest and runs no build — but the published tarball resolves as `@xbzb404/dsh-context-compression-selector`. The mismatch fails closed in the browser:
+  `client-modules: could not load "@xbzb404/…": …/client.js?rev=…: loaded without registering "@xbzb404/…" via __ModuleLoader__.load`.
+  The Host keeps serving and the Host-side plugin keeps loading, so nothing looks wrong from the CLI — only the browser half never contributes its `settings.section`, and 设置 → 内置插件 reports 本页面的插件未能完成同步.
+  `scripts/publish-selector.mjs` now re-targets the staged `lib/client.js` id the same way it already re-targeted the patch layer's row `name:`, and re-reads the staged bytes to prove the file npm will serve carries it.
+- **The patch layer and the client banner are now one checked pair.** Both are module identities the Host resolves; fixing one and shipping the other is what produced this release. `scripts/lib/selector-identity.mjs` holds the reader/rewriter both the publish script and the release gate use.
+
+### Verified
+
+- `pnpm run typecheck`, `pnpm run test` (520 passed, 1 skipped), `pnpm run test:built`, and `pnpm run verify:release` all pass. `packages/selector/tests/built/client-artifact.spec.ts` now asserts the tracked artifact announces the unscoped name, that re-targeting produces the scoped one, that only the banner id moves (the CSS tag id, `dataset.plugin`, and the `context-compression` settings entry id are untouched), and that a banner carrying an unexpected id throws instead of silently rewriting nothing.
+
+## 0.2.2-rc.3.3 - 2026-11-17
+
+### Fixed
+
+- **The published patch layer named the unscoped module id, so an npm install failed with `ERR_MODULE_NOT_FOUND` and never activated.** The patch layer's `name:` is the module id the Host imports, not a label. It has to follow the tarball into the scope; `scripts/publish-selector.mjs` now retargets it and fails when the line it needs is absent.
+- **The selector dependency was written as a plain version, so npm rejected it as an invalid spec** while the built code imports the *unscoped* runtime id. The staged manifest uses the `npm:` alias form, which installs the scoped runtime under the bare name the bundle actually imports.
+
 ## 0.2.2-rc.3 - 2026-11-17
 
 ### Changed

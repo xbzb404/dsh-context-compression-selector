@@ -283,7 +283,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for development expectations, [SECURITY.m
 
 ## Install
 
-Install the Bundle straight from this repository (see [Install](#install) above):
+The quickest path is the scoped npm package (see [Install](#install) above). To
+track this repository instead, install the Bundle from Git:
 
 ```sh
 dsh plugin add github:xbzb404/dsh-context-compression-selector
@@ -292,20 +293,20 @@ dsh --dump-config
 
 The repository root carries the Harness Bundle manifest field `dsh.bundle.patch`, so `dsh plugin add <github spec>` is the standard DeepSeek Harness installation path for an out-of-tree Bundle. Its exact-version runtime dependency, `dsh-context-compression-selector-runtime`, is resolved from the registry automatically; do not install or wire the two packages separately.
 
-> **Naming notice.** The plain npm names `dsh-context-compression-selector` and `dsh-context-compression-selector-runtime` belong to the upstream project this fork fixes. Do **not** install `dsh-context-compression-selector@latest` 鈥?that pulls upstream's build, not this one. Install from the GitHub spec above.
+> **Naming notice.** The plain npm names `dsh-context-compression-selector` and `dsh-context-compression-selector-runtime` belong to the upstream project this fork fixes. Do **not** install `dsh-context-compression-selector@latest` — that pulls upstream's build, not this one. Use the scoped name above or the GitHub spec.
 
 Restart the selected profile after installation. The config dump should list the selector Bundle as active.
 
-To update or remove it:
+To update or remove it, again with the scoped name:
 
 ```sh
-dsh plugin --profile <profile> up dsh-context-compression-selector@latest
-dsh plugin --profile <profile> remove dsh-context-compression-selector
+dsh plugin up @xbzb404/dsh-context-compression-selector
+dsh plugin remove @xbzb404/dsh-context-compression-selector
 ```
 
 ### Install from source (local, unpublished build)
 
-Use this when your Harness profile is on `0.2.2-rc.3` and you need the code in this working tree rather than the published `0.1.1`.
+Use this when your Harness profile needs a deliberately offline build.
 
 ```sh
 # 1. Build both packages (writes lib/) and pack them into local tarballs.
