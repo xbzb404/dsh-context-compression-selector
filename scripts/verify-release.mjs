@@ -81,8 +81,13 @@ for (const required of [
 }
 await stat(join(root, 'tsconfig.tests.json'))
 
-if (selectorPackage.dependencies?.['dsh-context-compression-selector-runtime'] !== selectorPackage.version) {
-  fail('selector must depend on the exact same runtime version')
+// The selector pins the runtime it ships against, and that pin must name a
+// real published version — but it need not equal the selector's own version.
+// A selector-only fix (0.2.2-rc.3.3) reuses the runtime already on npm
+// (0.2.2-rc.3), so require an exact pin, not an equal one.
+const runtimePin = selectorPackage.dependencies?.['dsh-context-compression-selector-runtime']
+if (typeof runtimePin !== 'string' || !/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/u.test(runtimePin)) {
+  fail(`selector must pin the runtime to one exact version, found "${runtimePin}"`)
 }
 if (selectorPackage.dsh?.bundle?.patch !== './cordis.patch.yml') {
   fail('selector must declare the DSH Bundle patch')
@@ -99,12 +104,14 @@ for (const [name, manifest] of [
   if (manifest.publishConfig?.access !== 'public') fail(`${name} publish access is not public`)
   if (manifest.publishConfig?.tag !== 'latest') fail(`${name} publish tag is not latest`)
 }
-// The peer floor must track the release series the plugin is built against:
-// resolving against an earlier 0.2.2 prerelease would silently pair this code
-// with a surface it does not match. Derive the expected range from the
-// package's own version so a release bump cannot leave the gate checking a
-// stale literal.
-const verifiedPeerRange = `>=${selectorPackage.version} <0.3.0`
+// The peer floor names the Harness release series this build targets, NOT the
+// plugin's own version: a plugin-only fix ships as 0.2.2-rc.3.1 (see
+// CONTRIBUTING "Versioning") while still building against Harness 0.2.2-rc.3.
+// Match the release prefix explicitly — splitting on '.' breaks here because
+// the prerelease tag carries its own dot ("0.2.2-rc.3.3" -> "0.2.2-rc").
+const harnessLine = selectorPackage.version.match(/^\d+\.\d+\.\d+(?:-[A-Za-z]+\.\d+)?/u)?.[0]
+if (harnessLine === undefined) fail(`cannot read a release series from version "${selectorPackage.version}"`)
+const verifiedPeerRange = `>=${harnessLine} <0.3.0`
 for (const peer of [
   '@deepseek-ai/dsh-command-compact',
   '@deepseek-ai/dsh-compaction-basic',

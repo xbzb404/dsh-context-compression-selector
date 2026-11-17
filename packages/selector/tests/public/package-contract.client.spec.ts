@@ -24,11 +24,15 @@ describe('standalone package contract', () => {
     expect(selector.dependencies?.['dsh-context-compression-selector-runtime']).toBe(runtime.version)
     expect(runtime.dependencies?.['@huggingface/tokenizers']).toBe('0.1.3')
     expect(Object.keys(selector.peerDependencies ?? {})).not.toContain('@deepseek-ai/dsh-compaction-tool-result-pruner')
-    // The peer floor tracks the release series: a plugin built against 0.2.2
-    // must not resolve against an earlier 0.2.2 prerelease whose surface it
-    // does not match. Deriving it from `version` keeps that invariant checked
-    // without a second place to bump on every release.
-    const floor = `>=${selector.version} <0.3.0`
+    // The peer floor names the Harness release series this build targets, NOT
+    // the plugin's own version. A plugin-only fix ships as 0.2.2-rc.3.1 (see
+    // CONTRIBUTING "Versioning") while still building against Harness
+    // 0.2.2-rc.3, so the floor stays on the three-field release. Splitting on
+    // '.' is wrong here because the prerelease tag carries a dot of its own
+    // ("0.2.2-rc.3.3"), so match the release prefix explicitly.
+    const harnessLine = selector.version.match(/^\d+\.\d+\.\d+(?:-[A-Za-z]+\.\d+)?/u)?.[0]
+    expect(harnessLine).toBeDefined()
+    const floor = `>=${harnessLine} <0.3.0`
     expect(selector.peerDependencies?.['@deepseek-ai/dsh-compaction-basic']).toBe(floor)
     expect(selector.peerDependencies?.['@deepseek-ai/dsh-command-compact']).toBe(floor)
     expect(selector.publishConfig?.tag).toBe('latest')
