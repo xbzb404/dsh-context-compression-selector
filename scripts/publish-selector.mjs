@@ -78,10 +78,26 @@ await rm(STAGE, { recursive: true, force: true })
 await mkdir(STAGE, { recursive: true })
 
 await cp(join(SELECTOR_DIR, 'lib'), join(STAGE, 'lib'), { recursive: true })
-await cp(join(SELECTOR_DIR, 'cordis.patch.yml'), join(STAGE, 'cordis.patch.yml'))
 for (const entry of ['README.md', 'README.zh.md', 'LICENSE', 'THIRD_PARTY_NOTICES.md']) {
   if (existsSync(join(SELECTOR_DIR, entry))) await cp(join(SELECTOR_DIR, entry), join(STAGE, entry))
 }
+
+// The patch layer's `name:` is the module id the Host imports, not a label. The
+// workspace version says the unscoped name because that is how the repository
+// install and local builds resolve it; once this tarball is installed the same
+// module lives at the scoped name, so the staged patch has to follow. Shipping
+// the unscoped id makes the Host fail with ERR_MODULE_NOT_FOUND for
+// 'dsh-context-compression-selector' and the Bundle silently never activates.
+const patchSource = await readFile(join(SELECTOR_DIR, 'cordis.patch.yml'), 'utf8')
+const unscoped = selectorManifest.name
+const patchedForPublish = patchSource.replaceAll(`'${unscoped}'`, `'${publishedName}'`)
+if (!patchedForPublish.includes(`'${publishedName}'`)) {
+  fail(
+    `cordis.patch.yml does not name the package as '${unscoped}', so the staged patch\n` +
+      `  cannot be retargeted at '${publishedName}'. Check the patch layer's row name.`,
+  )
+}
+await writeFile(join(STAGE, 'cordis.patch.yml'), patchedForPublish)
 
 /** The staged manifest: same payload, scoped identity, scoped runtime dependency. */
 const staged = {
