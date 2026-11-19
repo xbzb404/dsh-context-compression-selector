@@ -2,6 +2,26 @@
 
 All notable changes use this file. The project follows semantic versioning after `0.1.0`.
 
+## 0.2.2-rc.5 - 2026-11-19
+
+### Changed
+
+- **Re-targeted at DeepSeek Harness `0.2.2-rc.5`** (the current Desktop `nightly`): every `@deepseek-ai` devDependency and peer floor moves from `0.2.2-rc.3` to `0.2.2-rc.5`. As with every re-target, the version drops the fourth field — `0.2.2-rc.3.4` becomes `0.2.2-rc.5`, not `0.2.2-rc.5.5` — so the first three fields keep answering "which Harness is this for?" (see CONTRIBUTING "Versioning"). The cordis family pins are unchanged — cordis `4.1.0`, `cordis-plugin-loader` / `-include` / `-group` `1.1.0`, `@deepseek-ai/schemastery` `3.19.0` — because `0.2.2-rc.5` still ships that same generation. `@deepseek-ai/dsh-invariants` also stays at `0.2.0-rc.2`: it is still the newest published version.
+
+### Verified
+
+- **No source change was required.** Comparing every declaration file the plugin imports between `0.2.2-rc.3` and `0.2.2-rc.5` (17 packages, host and client halves) found exactly one difference: `@deepseek-ai/dsh-llm`'s `lib/types/error.d.ts` adds the `CONTENT_REFUSED` failure code to `LLM_FAILURE_CODES`. That is a pure addition, and this plugin reads no LLM failure codes — it imports only `createUserMessage` / `freezeMessage` and the `ContentBlock` / `UserMessage` / `TokenUsage` / `ToolCallId` types from that package. Every other package, including all six client packages that carry the `SlotMap` / `LocaleNamespaceMap` declaration-merging targets, is byte-identical.
+- `pnpm run typecheck`, `pnpm run test` (520 passed, 1 skipped), `pnpm run test:built`, and `pnpm run verify:release` all pass against the `0.2.2-rc.5` packages.
+
+### Publishing
+
+- `@xbzb404/dsh-context-compression-selector-runtime@0.2.2-rc.5` and `@xbzb404/dsh-context-compression-selector@0.2.2-rc.5` are published to the public npm registry, and the repository root's alias pin moved with them, so the `github:` install keeps resolving one exact version.
+
+### Fixed
+
+- **Repaired mojibake that had corrupted every non-ASCII character in the English `README.md`.** An earlier edit round-tripped the file through GBK: `—` became `鈥`, `→` became `鈫`, `×` became `脳`, `·` became `路`, and `…` became `鈥` plus a swallowed byte, so 31 lines rendered as garbage on GitHub (for example `Click the green Code button 鈫?Download ZIP`). Every damaged span was restored from the last clean revision and verified to contain no remaining replacement or mojibake sequence. The same pass repaired one comment line in `pnpm-workspace.yaml` and one line in this file.
+- The compatibility note now says "the **upstream** `0.1.1` releases (published under the unscoped name)" instead of "the published `0.1.1` releases", making clear that the version it names belongs to the upstream package rather than to this fork.
+
 ## 0.2.2-rc.3.4 - 2026-11-17
 
 ### Fixed
@@ -27,7 +47,7 @@ All notable changes use this file. The project follows semantic versioning after
 
 ### Changed
 
-- **Re-targeted at DeepSeek Harness `0.2.2-rc.3`** (the runtime bundled in Desktop `0.2.2-rc.3`): every `@deepseek-ai` devDependency and peer floor moves from `0.2.2-rc.1` to `0.2.2-rc.3`. The cordis family pins are unchanged 鈥?cordis `4.1.0`, `cordis-plugin-loader` / `-include` / `-group` `1.1.0`, `@deepseek-ai/schemastery` `3.19.0` 鈥?because `0.2.2-rc.3` still ships that same generation. `@deepseek-ai/dsh-invariants` also stays at `0.2.0-rc.2`: it is still the newest published version, and nothing between `rc.1` and `rc.3` changes the `InvariantInstaller` shape this plugin uses.
+- **Re-targeted at DeepSeek Harness `0.2.2-rc.3`** (the runtime bundled in Desktop `0.2.2-rc.3`): every `@deepseek-ai` devDependency and peer floor moves from `0.2.2-rc.1` to `0.2.2-rc.3`. The cordis family pins are unchanged — cordis `4.1.0`, `cordis-plugin-loader` / `-include` / `-group` `1.1.0`, `@deepseek-ai/schemastery` `3.19.0` — because `0.2.2-rc.3` still ships that same generation. `@deepseek-ai/dsh-invariants` also stays at `0.2.0-rc.2`: it is still the newest published version, and nothing between `rc.1` and `rc.3` changes the `InvariantInstaller` shape this plugin uses.
 - **The peer floors now start at `0.2.2-rc.3`.** Same load-bearing reason as every previous release: pnpm resolves a peer range to the *lowest* satisfying version, so a stale floor installs an older `@deepseek-ai/dsh-client-ui-slots` beside the root and splits the `SlotMap` / `LocaleNamespaceMap` declaration-merge targets. `scripts/verify-release.mjs` and `packages/selector/tests/public/package-contract.client.spec.ts` both used to pin the literal `0.2.2-rc.1`; they now **derive** the expected floor from the package's own `version`, so a release bump can no longer leave a gate checking a stale string while the invariant silently stops being enforced.
 
 ### Fixed

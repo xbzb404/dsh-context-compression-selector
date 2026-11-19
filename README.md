@@ -2,7 +2,7 @@
 
 > An auditable tool-result context-compression selector for DeepSeek Harness.
 
-Compatible with: dsh `0.2.2-rc.3` (works on `0.2.x`; tested against DeepSeek Harness Desktop `0.2.2-rc.3`).
+Compatible with: dsh `0.2.2-rc.5` (works on `0.2.x`; tested against DeepSeek Harness Desktop `0.2.2-rc.5`).
 
 [中文说明](README.zh.md) · [Report an issue](https://github.com/xbzb404/dsh-context-compression-selector/issues)
 
@@ -23,6 +23,14 @@ The selector layer should be listed in `dsh --dump-config`; restart Harness to a
 
 The runtime, `@xbzb404/dsh-context-compression-selector-runtime`, resolves as a
 dependency; do not install it separately.
+
+> **This is not an `npm install` package.** `@deepseek-ai/cordis` is declared
+> `>=4.1.0 <5`, but the `@deepseek-ai/cordis-plugin-include@1.1.0` it also needs
+> accepts only `~4.1.0`, so npm's peer resolver reports `ERESOLVE` and refuses. The
+> Harness plugin installer is unaffected — `dsh plugin add` above is the supported
+> path. If you must put this Bundle into a plain npm project, add
+> `--legacy-peer-deps` (or `--force`); that install is not guaranteed to run, since
+> the Host and Bundle versions then have to be aligned by hand.
 
 To update or remove it, again with the full scoped name:
 
@@ -50,17 +58,17 @@ For the no-command path (Windows, no Node/npm/account), see below.
 
 **The easy path: download, unpack, double-click.** Four steps, nothing to type.
 
-1. Click the green **`Code`** button at the top of this page 鈫?**`Download ZIP`**
+1. Click the green **`Code`** button at the top of this page → **`Download ZIP`**
    (direct link: <https://github.com/xbzb404/dsh-context-compression-selector/archive/refs/heads/main.zip>).
-2. Unpack the zip anywhere, for example `D:\dsh-ctx` (right-click 鈫?*Extract All鈥?).
-3. **Quit DeepSeek Harness completely 鈥?including the tray icon** (right-click the tray icon 鈫?Quit).
+2. Unpack the zip anywhere, for example `D:\dsh-ctx` (right-click → *Extract All…*).
+3. **Quit DeepSeek Harness completely — including the tray icon** (right-click the tray icon → Quit).
 4. Double-click this file:
 
    ```
    D:\dsh-ctx\dsh-context-compression-selector-main\release-package\install.cmd
    ```
 
-   If Windows shows a blue **鈥淲indows protected your PC鈥?* box, click **More info** 鈫?**Run anyway**. The script only copies files into your own Harness profile: it never downloads anything, never runs npm/pnpm, and never asks for an account.
+   If Windows shows a blue **“Windows protected your PC”** box, click **More info** → **Run anyway**. The script only copies files into your own Harness profile: it never downloads anything, never runs npm/pnpm, and never asks for an account.
 
 5. Wait until you see `=== done ===`, then start DeepSeek Harness again.
 
@@ -69,11 +77,11 @@ The installer does all of this by itself:
 | step | what it does |
 |---|---|
 | 1 | backs up `%USERPROFILE%\.dsh\profiles\desktop\package.json` |
-| 2 | copies the 6 packages from its `vendor\` folder into `鈥profiles\desktop\node_modules\` |
+| 2 | copies the 6 packages from its `vendor\` folder into `…\profiles\desktop\node_modules\` |
 | 3 | registers `dsh-context-compression-selector` in the profile's `dsh.profile.bundles` |
 | 4 | checks that every entry file landed, and names anything missing |
 
-Then open **Settings 鈫?Context compression**, choose the **Balanced** profile, and pick the `standard--compression` preset for new sessions (see [Profiles](#profiles)).
+Then open **Settings → Context compression**, choose the **Balanced** profile, and pick the `standard--compression` preset for new sessions (see [Profiles](#profiles)).
 
 ### The same install, as commands
 
@@ -115,15 +123,15 @@ set DSH_HOME=D:\dsh-home
 
 | what you see | what to do |
 |---|---|
-| `[X] DeepSeek Harness is running.` | Quit it completely 鈥?the tray icon too 鈥?and run the script again. |
-| `[X] no Harness profile at 鈥 | Start DeepSeek Harness once so it creates the profile, quit it, then run the script again. |
-| You want the previous state back | The script prints its backup path, e.g. `copy /Y "鈥package.json.bak-install-12345" "鈥package.json"`, and you can then delete `dsh-context-compression-selector`, `dsh-context-compression-selector-runtime`, `js-yaml`, `@huggingface`, `@deepseek-ai\dsh-compaction-basic` and `@deepseek-ai\dsh-command-compact` from `鈥profiles\desktop\node_modules`. |
+| `[X] DeepSeek Harness is running.` | Quit it completely — the tray icon too — and run the script again. |
+| `[X] no Harness profile at …` | Start DeepSeek Harness once so it creates the profile, quit it, then run the script again. |
+| You want the previous state back | The script prints its backup path, e.g. `copy /Y "…\package.json.bak-install-12345" "…\package.json"`, and you can then delete `dsh-context-compression-selector`, `dsh-context-compression-selector-runtime`, `js-yaml`, `@huggingface`, `@deepseek-ai\dsh-compaction-basic` and `@deepseek-ai\dsh-command-compact` from `…\profiles\desktop\node_modules`. |
 | Nothing new appears in Settings | The Host half loads at startup: restart the app. Compression also needs the `--compression` preset picked for the session. |
 
 <details>
 <summary>Why not <code>npm</code>/<code>pnpm</code> or the <code>dsh</code> CLI?</summary>
 
-The desktop profile is owned by the Electron application. Any package-manager run rewrites `node_modules` right before launch, and Harness hashes each client bundle's `mtimeMs`/`ctimeMs`/`size` into the module-graph revision it bakes into the served page 鈥?so the renderer then requests stale URLs and the whole settings panel fails to load. A plain file copy, performed while the app is closed, avoids that, and it needs no Node, npm or account. See [`release-package/README.md`](release-package/README.md) for the details.
+The desktop profile is owned by the Electron application. Any package-manager run rewrites `node_modules` right before launch, and Harness hashes each client bundle's `mtimeMs`/`ctimeMs`/`size` into the module-graph revision it bakes into the served page — so the renderer then requests stale URLs and the whole settings panel fails to load. A plain file copy, performed while the app is closed, avoids that, and it needs no Node, npm or account. See [`release-package/README.md`](release-package/README.md) for the details.
 </details>
 
 
@@ -140,7 +148,7 @@ The desktop profile is owned by the Electron application. Any package-manager ru
 > - **Ported to Harness `0.2.0-rc.2`.** Compression now ships as **derived preset variants** (`<preset>--compression`) declared through the 0.2.0 `AgentPresetRegistry`, replacing the `0.1.x` path-decoration overlay. Your original presets are never rewritten.
 > - **Settings are served by the profile row itself.** The Bundle's row id is `context-compression`, which is also its settings namespace, so the browser selector reads exactly the form that row declares.
 > - **DeepSeek-V4.1-Flash is supported on the Harness default route.** `deepseek-flash` resolves an exact bundled tokenizer instead of failing closed, so exact-gated compression is no longer a no-op on the default model.
-> - Vision image-token arithmetic is re-ported to the official V4.1 image processor: the per-image cap moves 384 鈫?1024, the minimum-pixel floor 147456 鈫?295936, and the aspect clamp is gone.
+> - Vision image-token arithmetic is re-ported to the official V4.1 image processor: the per-image cap moves 384 → 1024, the minimum-pixel floor 147456 → 295936, and the aspect clamp is gone.
 >
 > See [CHANGELOG.md](CHANGELOG.md) for the full release history.
 
@@ -164,21 +172,21 @@ The plugin records the selected policy and each decision: stage, reducer, trigge
 
 Choose a compression profile from DeepSeek Harness settings, and set the Auto Compact trigger level in the same section. Settings are frozen when a session first observes them, so changing a setting affects new sessions rather than silently changing an active task.
 
-The Bundle's `cordis.patch.yml` inserts exactly one profile row, and its id 鈥?`context-compression` 鈥?**is** the settings namespace. Harness `0.2.0` serves one settings form per profile-row entry id, so the row you install is the form the browser reads; there is no second document to keep in sync. If you rename the row, rename `CONTEXT_COMPRESSION_SETTINGS_NAMESPACE` with it or the form is orphaned.
+The Bundle's `cordis.patch.yml` inserts exactly one profile row, and its id — `context-compression` — **is** the settings namespace. Harness `0.2.0` serves one settings form per profile-row entry id, so the row you install is the form the browser reads; there is no second document to keep in sync. If you rename the row, rename `CONTEXT_COMPRESSION_SETTINGS_NAMESPACE` with it or the form is orphaned.
 
 ### How compression reaches a session (`0.2.0`)
 
 Harness `0.2.0` makes `AgentPresetRegistry` the single authority for preset composition: a preset is declared by its owner (`register({ id, plugins })`) and discovery no longer walks directories. A plugin therefore cannot decorate someone else's preset in place, and the `0.1.x` overlay mechanism is gone.
 
-Instead, the Bundle declares **derived variants**: for every preset the registry already lists, the plugin registers a sibling with the id `<source>--compression` and the name `<source name> 路 Context compression`, whose entry list is the source's own rows with the compression stack appended. Because the Host's own declarations carry no description, each variant also carries its own: what it adds over the native preset and the Auto Compact threshold that generation froze. Variants are published once per distinct compression configuration and are reference-counted, so the built-in row and the Bundle row never install two compression stacks; disposing the row withdraws exactly the variants it registered. Presets the plugin excludes 鈥?and presets it marked `broken` 鈥?get no variant.
+Instead, the Bundle declares **derived variants**: for every preset the registry already lists, the plugin registers a sibling with the id `<source>--compression` and the name `<source name> 路 Context compression`, whose entry list is the source's own rows with the compression stack appended. Because the Host's own declarations carry no description, each variant also carries its own: what it adds over the native preset and the Auto Compact threshold that generation froze. Variants are published once per distinct compression configuration and are reference-counted, so the built-in row and the Bundle row never install two compression stacks; disposing the row withdraws exactly the variants it registered. Presets the plugin excludes — and presets it marked `broken` — get no variant.
 
 Pick the variant preset (for example `standard--compression` instead of `standard`) in your profile to run compression. The source preset keeps working untouched next to it.
 
-The variants exist because the compression runtime has to live inside the same scope group as the compactor that consumes it: it provides `toolResultPruner`, and `dsh-compaction` only resolves that service from its own isolated realm. Mounting the runtime at the root does not reach it 鈥?the preset composition is the only supported path.
+The variants exist because the compression runtime has to live inside the same scope group as the compactor that consumes it: it provides `toolResultPruner`, and `dsh-compaction` only resolves that service from its own isolated realm. Mounting the runtime at the root does not reach it — the preset composition is the only supported path.
 
 ### Auto Compact threshold
 
-The selector settings section exposes `autoCompact.thresholdPercent`: an integer between 50% and 90% (step 1%), defaulting to 80%. Enter any valid value, such as 73%, directly in the field. Values outside the recommended 70鈥?5% band show a risk note but remain savable. The level is written into the generated `compaction-basic` composition as `thresholdRatio` and, from the same read, into the plugin runtime's deployment config, so one standing generation can never run Auto Compact and micro compact on two different thresholds. It rescales the standard-profile History trigger, minimum reclaim, recent-token tail, and the micro-compact last-chance deadline `D = floor(A 脳 0.875)` around `A = floor(C 脳 a)`, where `a = thresholdPercent / 100` is used as a floating-point ratio 鈥?the same arithmetic order `compaction-basic` itself uses. At the default 80% on a 1M context the previous numbers are reproduced exactly. Fresh, Aggregate, Native single-result budgets, the 10-call working set, and the Auto Compact retain ratio are unchanged in this release; Custom stays manual.
+The selector settings section exposes `autoCompact.thresholdPercent`: an integer between 50% and 90% (step 1%), defaulting to 80%. Enter any valid value, such as 73%, directly in the field. Values outside the recommended 70–85% band show a risk note but remain savable. The level is written into the generated `compaction-basic` composition as `thresholdRatio` and, from the same read, into the plugin runtime's deployment config, so one standing generation can never run Auto Compact and micro compact on two different thresholds. It rescales the standard-profile History trigger, minimum reclaim, recent-token tail, and the micro-compact last-chance deadline `D = floor(A × 0.875)` around `A = floor(C × a)`, where `a = thresholdPercent / 100` is used as a floating-point ratio — the same arithmetic order `compaction-basic` itself uses. At the default 80% on a 1M context the previous numbers are reproduced exactly. Fresh, Aggregate, Native single-result budgets, the 10-call working set, and the Auto Compact retain ratio are unchanged in this release; Custom stays manual.
 
 ![Context Compression Selector settings UI](docs/assets/context-compression-selector-settings.png)
 
@@ -198,16 +206,16 @@ The runtime ships pinned official DeepSeek V4 tokenizer assets and verifies thei
 | `deepseek-v4-flash`                     | `DeepSeek-V4.1-Flash` | Supported                                                                                                                              |
 | `deepseek-v4-flash-vision-exp`          | `DeepSeek-V4.1-Flash` | Supported: exact text counting plus bounded image-token estimates; image-bearing rewrite candidates remain exact-ineligible and intact |
 | `deepseek-v4-pro`                       | `DeepSeek-V4-Pro`     | Supported                                                                                                                              |
-| Other DeepSeek model IDs                | 鈥?                    | Not supported; fail open                                                                                                               |
-| Non-DeepSeek models in DeepSeek Harness | 鈥?                    | Not supported; fail open                                                                                                               |
+| Other DeepSeek model IDs                | —                    | Not supported; fail open                                                                                                               |
+| Non-DeepSeek models in DeepSeek Harness | —                    | Not supported; fail open                                                                                                               |
 
-The V4.1-Flash routes are served by a bundled official tokenizer pinned at `deepseek-ai/DeepSeek-V4.1-Flash` revision `dba1be0a40aa45a94ad051997016db3960a90277`; `deepseek-v4-pro` keeps its own separately pinned `deepseek-ai/DeepSeek-V4-Pro` tokenizer. The two vocabularies are deliberately never treated as aliases of each other. Vision image tokens use a line-by-line port of the official V4.1 image processor (patch size 14, downsample ratio 3, 1024-token cap, min pixels 295936, and no aspect clamp because the official config pins `max_wh_ratio` to `null`), validated against golden fixtures generated by executing the official Python implementation. The V4.1 block length is exactly `nLlmH * (nLlmW + 1) + 2` and carries no alignment padding, so it does not depend on the absolute serialized position. A valid image is reported as `tokenizer-estimate` at that block length, with 1024 tokens retained as the per-image conservative upper bound. If dimensions are malformed or cannot be evaluated, the plugin charges a fixed 256-token fallback instead of making the visual surface unavailable. These values are deliberately approximate because the adapter's final request-image projection 鈥?including per-route pixel-budget overrides and byte-cap reprojection 鈥?is not exposed through the current measurement seam; an 800脳800 upload projected to 512脳512 can therefore differ materially from its intrinsic estimate. The estimate improves pressure accounting but never authorizes a lossy rewrite: image-bearing tool-result candidates remain exact-ineligible and are never rewritten, deleted, or counted as zero. Exposing projected dimensions upstream would allow a later exact counter.
+The V4.1-Flash routes are served by a bundled official tokenizer pinned at `deepseek-ai/DeepSeek-V4.1-Flash` revision `dba1be0a40aa45a94ad051997016db3960a90277`; `deepseek-v4-pro` keeps its own separately pinned `deepseek-ai/DeepSeek-V4-Pro` tokenizer. The two vocabularies are deliberately never treated as aliases of each other. Vision image tokens use a line-by-line port of the official V4.1 image processor (patch size 14, downsample ratio 3, 1024-token cap, min pixels 295936, and no aspect clamp because the official config pins `max_wh_ratio` to `null`), validated against golden fixtures generated by executing the official Python implementation. The V4.1 block length is exactly `nLlmH * (nLlmW + 1) + 2` and carries no alignment padding, so it does not depend on the absolute serialized position. A valid image is reported as `tokenizer-estimate` at that block length, with 1024 tokens retained as the per-image conservative upper bound. If dimensions are malformed or cannot be evaluated, the plugin charges a fixed 256-token fallback instead of making the visual surface unavailable. These values are deliberately approximate because the adapter's final request-image projection — including per-route pixel-budget overrides and byte-cap reprojection — is not exposed through the current measurement seam; an 800×800 upload projected to 512×512 can therefore differ materially from its intrinsic estimate. The estimate improves pressure accounting but never authorizes a lossy rewrite: image-bearing tool-result candidates remain exact-ineligible and are never rewritten, deleted, or counted as zero. Exposing projected dimensions upstream would allow a later exact counter.
 
-鈥淔ail open鈥?means the original tool result remains in context and an auditable skip or failure record is emitted. The selector does not estimate tokens with character counts and must not be treated as a generic multi-provider compressor.
+“Fail open” means the original tool result remains in context and an auditable skip or failure record is emitted. The selector does not estimate tokens with character counts and must not be treated as a generic multi-provider compressor.
 
 ## Pre-compression and historical compression are different
 
-**Fresh and Aggregate are pre-compression, not History compression.** They reduce a newly produced tool result before it is first sent to the model. The reducer selects a safe strategy from the tool name, command arguments, and content evidence鈥攆or example JSON, search, file read, Git, package, build, test, or shell output. Because this only bounds new material and does not rewrite the serialized prompt prefix already sent to the provider, it does not break an existing prompt cache.
+**Fresh and Aggregate are pre-compression, not History compression.** They reduce a newly produced tool result before it is first sent to the model. The reducer selects a safe strategy from the tool name, command arguments, and content evidence—for example JSON, search, file read, Git, package, build, test, or shell output. Because this only bounds new material and does not rewrite the serialized prompt prefix already sent to the provider, it does not break an existing prompt cache.
 
 **History / micro-compact is historical compression.** It selects old tool results outside the protected working set, then replaces each selected result in active context with a short, recoverable multi-line placeholder beginning `[Old tool result content cleared from active context]`. The placeholder retains the tool name, status, source reference, and retrieval instruction, while the original durable event remains recoverable. This intentionally rewrites an already-sent prefix, so it breaks or restarts the prompt cache. History protects the union of the newest 10 agent tool calls and the latest 64,000 tool-result tokens before it considers older results.
 
@@ -243,15 +251,15 @@ Profiles are orchestration policies, not separate compression algorithms. A prof
 | Profile      | Fresh / Aggregate               | History                                                                                                                                      | Native tool trimming    | TailTrim                      |
 | ------------ | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- | ----------------------------- |
 | Off          | Disabled                        | Disabled                                                                                                                                     | Disabled                | Disabled                      |
-| Native       | Disabled                        | Disabled                                                                                                                                     | Enabled (`4096 鈫?2048`) | Disabled                      |
-| Balanced     | `8192 鈫?3072` / `32768 鈫?12288` | Routine at `500000`; retain 10 recent calls and a 64,000-token tail                                                                          | Disabled                | Disabled                      |
+| Native       | Disabled                        | Disabled                                                                                                                                     | Enabled (`4096 → 2048`) | Disabled                      |
+| Balanced     | `8192 → 3072` / `32768 → 12288` | Routine at `500000`; retain 10 recent calls and a 64,000-token tail                                                                          | Disabled                | Disabled                      |
 | Cache Strict | Same as Balanced                | Full-request last chance at `D = 700000`; once `D` is reached, the planner may run even when tool-result tokens are at or below `H = 600000` | Disabled                | Disabled                      |
-| Savings      | `4096 鈫?1536` / `16384 鈫?4096`  | Routine at `400000`                                                                                                                          | Disabled                | Disabled                      |
+| Savings      | `4096 → 1536` / `16384 → 4096`  | Routine at `400000`                                                                                                                          | Disabled                | Disabled                      |
 | Adaptive     | Same as Balanced                | Conservative estimated routing at `500000`, with a capacity-pressure safety override                                                         | Disabled                | Disabled                      |
 | Custom       | Configurable                    | Configurable                                                                                                                                 | Disabled                | Optional, disabled by default |
 
 
-History protects the union of the newest 10 agent tool calls and the latest 64,000 tool-result tokens. Older eligible results are rewritten only when the policy can reclaim its required minimum. The History trigger, minimum-reclaim, and tail numbers in the table are the values at the default 80% Auto Compact level; they rescale with `A = floor(C 脳 a)` (`a = thresholdPercent / 100`, floating-point ratio) once you change the threshold (see Auto Compact threshold above).
+History protects the union of the newest 10 agent tool calls and the latest 64,000 tool-result tokens. Older eligible results are rewritten only when the policy can reclaim its required minimum. The History trigger, minimum-reclaim, and tail numbers in the table are the values at the default 80% Auto Compact level; they rescale with `A = floor(C × a)` (`a = thresholdPercent / 100`, floating-point ratio) once you change the threshold (see Auto Compact threshold above).
 
 ### Adaptive limitation and upstream capability request
 
@@ -261,9 +269,9 @@ Perfect adaptive behavior requires DeepSeek to expose cache-breakpoint control a
 
 ## Compatibility
 
-- Verified against DeepSeek Harness `0.2.2-rc.3` using public plugin and profile APIs only.
+- Verified against DeepSeek Harness `0.2.2-rc.5` using public plugin and profile APIs only.
 - Requires Node `^22.19.0 || >=24`.
-- **Requires Harness `0.2.2-rc.3`.** This branch is **not** compatible with the `0.1.x` Harness line: the published `0.1.1` releases target `dsh-v0.1.1-rc.2`, while this working tree is ported to the `0.2.2-rc.3` public API surface (`AgentPresetRegistry.register()` preset variants, `SettingsForms.describe()` settings reads, `ConfigForms`-backed `settings.section`, `snapshotEvents()` / `inheritedEventCount` session reads, branded `SessionSeq`, and `Promise<Agent>` from `AgentLoop.create()`). Installing it into a `0.1.x` profile will fail to load.
+- **Requires Harness `0.2.2-rc.5`.** This branch is **not** compatible with the `0.1.x` Harness line: the upstream `0.1.1` releases (published under the unscoped name) target `dsh-v0.1.1-rc.2`, while this working tree is ported to the `0.2.2-rc.5` public API surface (`AgentPresetRegistry.register()` preset variants, `SettingsForms.describe()` settings reads, `ConfigForms`-backed `settings.section`, `snapshotEvents()` / `inheritedEventCount` session reads, branded `SessionSeq`, and `Promise<Agent>` from `AgentLoop.create()`). Installing it into a `0.1.x` profile will fail to load.
 - The project contains only this Bundle and its runtime; it does not vendor or modify DeepSeek Harness core.
 - This is an unofficial community project and is not affiliated with or endorsed by DeepSeek.
 
@@ -319,8 +327,8 @@ cd packages/selector && pnpm pack --pack-destination ../../release-artifacts && 
 This produces two files in `release-artifacts/`:
 
 ```
-dsh-context-compression-selector-runtime-0.2.2-rc.3.tgz
-dsh-context-compression-selector-0.2.2-rc.3.tgz
+dsh-context-compression-selector-runtime-0.2.2-rc.5.tgz
+dsh-context-compression-selector-0.2.2-rc.5.tgz
 ```
 
 Then install them **together** into the target profile:
@@ -328,22 +336,22 @@ Then install them **together** into the target profile:
 ```sh
 cd ~/.dsh/profiles/<profile>
 
-# First pin the exact runtime dependency to the local tarball (required 鈥?see below).
+# First pin the exact runtime dependency to the local tarball (required — see below).
 # Append to pnpm-workspace.yaml:
 #   overrides:
-#     dsh-context-compression-selector-runtime: file:<abs-path>/release-artifacts/dsh-context-compression-selector-runtime-0.2.2-rc.3.tgz
+#     dsh-context-compression-selector-runtime: file:<abs-path>/release-artifacts/dsh-context-compression-selector-runtime-0.2.2-rc.5.tgz
 
-pnpm add --registry=https://registry.npmmirror.com file:<abs-path>/release-artifacts/dsh-context-compression-selector-runtime-0.2.2-rc.3.tgz
-pnpm add --registry=https://registry.npmmirror.com file:<abs-path>/release-artifacts/dsh-context-compression-selector-0.2.2-rc.3.tgz
+pnpm add --registry=https://registry.npmmirror.com file:<abs-path>/release-artifacts/dsh-context-compression-selector-runtime-0.2.2-rc.5.tgz
+pnpm add --registry=https://registry.npmmirror.com file:<abs-path>/release-artifacts/dsh-context-compression-selector-0.2.2-rc.5.tgz
 ```
 
 #### Why the `overrides` entry is required
 
-The selector declares its runtime dependency as an **exact** version (`"dsh-context-compression-selector-runtime": "0.2.2-rc.3"`). The package manager re-resolves the whole dependency tree on every `add`, so:
+The selector declares its runtime dependency as an **exact** version (`"dsh-context-compression-selector-runtime": "0.2.2-rc.5"`). The package manager re-resolves the whole dependency tree on every `add`, so:
 
-- installing only the selector tarball looks up `0.2.2-rc.3` under the **plain** name, which is not what this fork publishes 鈫?`ERR_PNPM_NO_MATCHING_VERSION`;
-- **installing the runtime first does not help** 鈥?the second `add` still re-resolves that exact name against the registry, with the same result;
-- passing both tarballs in one command does not work either 鈥?pnpm prefers the registry and will not adopt the sibling tarball from the same invocation.
+- installing only the selector tarball looks up `0.2.2-rc.5` under the **plain** name, which is not what this fork publishes → `ERR_PNPM_NO_MATCHING_VERSION`;
+- **installing the runtime first does not help** — the second `add` still re-resolves that exact name against the registry, with the same result;
+- passing both tarballs in one command does not work either — pnpm prefers the registry and will not adopt the sibling tarball from the same invocation.
 
 An `overrides` entry is the way to pin the dependency to a local file. It must live in the profile's `pnpm-workspace.yaml`: **pnpm 11 no longer reads the `pnpm` field in `package.json`** and warns that it is ignored.
 
@@ -353,7 +361,7 @@ The published-and-working path is the GitHub install above, where the root manif
 
 #### One-shot script (recommended)
 
-`scripts/install-from-tarballs.mjs` performs all of the above 鈥?writing the override, registering the Bundle, and verifying the result:
+`scripts/install-from-tarballs.mjs` performs all of the above — writing the override, registering the Bundle, and verifying the result:
 
 ```sh
 node scripts/install-from-tarballs.mjs --profile <profile>
@@ -363,13 +371,13 @@ It backs up `package.json` first, so a failure can be rolled back from the backu
 
 #### How the `dsh plugin add github:` path works
 
-pnpm resolves a git dependency's own dependencies from the registry only and does no relative resolution inside the checkout 鈥?and since pnpm 10 it rejects git/URL *sub*dependencies outright (`ERR_PNPM_EXOTIC_SUBDEP`). That is why exactly one piece, the runtime, is published to a registry under the maintainer scope and mapped back to its original name through an `npm:` alias in the root manifest. Everything else 鈥?host half, browser half, patch layer, build output 鈥?travels in the git checkout, so `lib/` is committed and no build runs on the user's machine.
+pnpm resolves a git dependency's own dependencies from the registry only and does no relative resolution inside the checkout — and since pnpm 10 it rejects git/URL *sub*dependencies outright (`ERR_PNPM_EXOTIC_SUBDEP`). That is why exactly one piece, the runtime, is published to a registry under the maintainer scope and mapped back to its original name through an `npm:` alias in the root manifest. Everything else — host half, browser half, patch layer, build output — travels in the git checkout, so `lib/` is committed and no build runs on the user's machine.
 
 Rebuilding or republishing the runtime: `node scripts/publish-runtime.mjs` (dry run) / `--publish`.
 
 The tarball flow below still works for offline machines.
 
-The selector registers itself through the Bundle manifest field `dsh.bundle.patch`, so it also has to appear in the profile's bundle list (`package.json` 鈫?`dsh.profile.bundles`) before a restart picks it up:
+The selector registers itself through the Bundle manifest field `dsh.bundle.patch`, so it also has to appear in the profile's bundle list (`package.json` → `dsh.profile.bundles`) before a restart picks it up:
 
 ```sh
 dsh --profile <profile> --dump-config

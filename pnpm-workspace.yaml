@@ -8,7 +8,7 @@ peerDependencyRules:
     # @deepseek-ai/dsh-invariants is still published only up to 0.2.0-rc.2, whose
     # peer range is `@deepseek-ai/cordis: ~4.0.4`. Harness 0.2.2 ships cordis
     # 4.1.0, so that range is stale. The surface this plugin uses (Service,
-    # Inject, merged Context) is unchanged across 4.0 鈫?4.1.
+    # Inject, merged Context) is unchanged across 4.0 → 4.1.
     "@deepseek-ai/cordis": ">=4.0.4 <5"
     typescript: ">=5 <7"
 
@@ -21,7 +21,7 @@ overrides:
   # `InvariantInstaller` and `ctx.invariants` "does not exist". Forcing one
   # instance is also what production does: the Host resolves a single cordis.
   #
-  # `1.1.0` has no peer dependencies of its own, while `1.0.6` peers on cordis 鈥?
+  # `1.1.0` has no peer dependencies of its own, while `1.0.6` peers on cordis —
   # so pinning the loader is what actually collapses the cordis peer variations
   # from two instances down to one.
   "@deepseek-ai/cordis": 4.1.0
@@ -41,4 +41,62 @@ allowBuilds:
   "@huggingface/tokenizers": true
 
 minimumReleaseAgeExclude:
-  - "@xbzb404/dsh-context-compression-selector-runtime@0.2.2-rc.3"
+  - "@xbzb404/dsh-context-compression-selector-runtime@0.2.2-rc.3 || 0.2.2-rc.5"
+  - "@deepseek-ai/dsh-agent-loop-testkit@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-agent-loop@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-agent-preset-registry@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-agent@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-anonymous-user-id@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-app-boot@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-atomic-write@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-attachment@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-brand@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-chunked-list@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-client-locale@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-client-modules@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-client-ui-primitives@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-client-ui-settings@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-client-ui-slots@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-client-ui-workspace@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-command-compact@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-commands@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-compaction-basic@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-compaction-image-offload@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-compaction@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-config-editor@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-deepseek-llm-api-extensions@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-error@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-fs-local@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-fs-patch@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-fs@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-home-paths@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-launch-environment@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-llm-deepseek@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-llm-retry@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-llm@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-native-command@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-official-bundles@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-package-manifest@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-ptc-runtime@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-sandbox-policy@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-sandbox@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-scope@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-session-persistence@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-session-projection@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-session@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-settings@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-subagent-fork-in-process@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-subagent-spawn-in-process@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-subagent@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-system-prompt@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-timeout@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-token-meter@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-tool-executor-native@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-tool-executor-ptc@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-tools@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-typert-protocol@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-user-approval@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-util-crypto@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-util-time@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-util-values@0.2.2-rc.5"
+  - "@deepseek-ai/dsh-working-directory@0.2.2-rc.5"

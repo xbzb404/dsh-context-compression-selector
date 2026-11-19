@@ -2,7 +2,7 @@
 
 > 面向 DeepSeek Harness 的、可审计的工具结果上下文压缩选择器。
 
-Compatible with: dsh `0.2.2-rc.3`（适配 `0.2.x`，已在 DeepSeek Harness 桌面端 `0.2.2-rc.3` 实测）。
+Compatible with: dsh `0.2.2-rc.5`（适配 `0.2.x`，已在 DeepSeek Harness 桌面端 `0.2.2-rc.5` 实测）。
 
 [English README](README.md) · [提交问题](https://github.com/xbzb404/dsh-context-compression-selector/issues)
 
@@ -30,6 +30,13 @@ dsh plugin remove @xbzb404/dsh-context-compression-selector
 
 运行时包 `@xbzb404/dsh-context-compression-selector-runtime` 作为依赖自动解析，
 不需要单独安装。
+
+> **不用 `npm install`。** 本包声明的 peer 依赖里，`@deepseek-ai/cordis` 要求
+> `>=4.1.0 <5`，而它同时依赖的 `@deepseek-ai/cordis-plugin-include@1.1.0` 只接受
+> `~4.1.0`，npm 的 peer 解析器会判成冲突并以 `ERESOLVE` 失败。Harness 的插件安装器
+> 不受影响，上面的 `dsh plugin add` 就是支持路径。如果你确实要把本包装进一个普通
+> npm 项目，必须加 `--legacy-peer-deps`（或 `--force`）才能装上——但那种装法不保证
+> 能跑，Host 与 Bundle 的版本需要自行对齐。
 
 ### 从 Git 仓库安装
 
@@ -257,9 +264,9 @@ Adaptive 在设置界面中显示为**保守成本**。它目前有意不是一�
 
 ## 兼容性
 
-- 已基于 DeepSeek Harness `0.2.2-rc.3` 验证，并且只使用公开的插件与 Profile API。
+- 已基于 DeepSeek Harness `0.2.2-rc.5` 验证，并且只使用公开的插件与 Profile API。
 - 需要 Node `^22.19.0 || >=24`。
-- **要求 Harness `0.2.2-rc.3`。** 本分支与 `0.1.x` Harness 产品线**不兼容**：已发布的 `0.1.1` 面向 `dsh-v0.1.1-rc.2`，而本工作树已迁移到 `0.2.2-rc.3` 的公开 API 面（`AgentPresetRegistry.register()` 预设变体、`SettingsForms.describe()` 设置读取、`ConfigForms` 驱动的 `settings.section`、`snapshotEvents()` / `inheritedEventCount` 会话读取、带品牌的 `SessionSeq`，以及 `AgentLoop.create()` 返回 `Promise<Agent>`）。装进 `0.1.x` Profile 会加载失败。
+- **要求 Harness `0.2.2-rc.5`。** 本分支与 `0.1.x` Harness 产品线**不兼容**：上游的 `0.1.1`（以无 scope 的包名发布）面向 `dsh-v0.1.1-rc.2`，而本工作树已迁移到 `0.2.2-rc.5` 的公开 API 面（`AgentPresetRegistry.register()` 预设变体、`SettingsForms.describe()` 设置读取、`ConfigForms` 驱动的 `settings.section`、`snapshotEvents()` / `inheritedEventCount` 会话读取、带品牌的 `SessionSeq`，以及 `AgentLoop.create()` 返回 `Promise<Agent>`）。装进 `0.1.x` Profile 会加载失败。
 - 本项目只包含该 Bundle 与 runtime，不 vendoring 或修改 DeepSeek Harness 核心。
 - 这是非官方社区项目，与 DeepSeek 不存在隶属或背书关系。
 
@@ -294,8 +301,8 @@ cd packages/selector && pnpm pack --pack-destination ../../release-artifacts && 
 这会在 `release-artifacts/` 下生成两个文件：
 
 ```
-dsh-context-compression-selector-runtime-0.2.2-rc.3.tgz
-dsh-context-compression-selector-0.2.2-rc.3.tgz
+dsh-context-compression-selector-runtime-0.2.2-rc.5.tgz
+dsh-context-compression-selector-0.2.2-rc.5.tgz
 ```
 
 然后**一起**安装到目标 Profile：
@@ -306,17 +313,17 @@ cd ~/.dsh/profiles/<profile>
 # 先把 runtime 精确依赖 pin 到本地 tarball（见下方说明，这一步不可省略）
 # 在 pnpm-workspace.yaml 末尾追加：
 #   overrides:
-#     dsh-context-compression-selector-runtime: file:<绝对路径>/release-artifacts/dsh-context-compression-selector-runtime-0.2.2-rc.3.tgz
+#     dsh-context-compression-selector-runtime: file:<绝对路径>/release-artifacts/dsh-context-compression-selector-runtime-0.2.2-rc.5.tgz
 
-pnpm add --registry=https://registry.npmmirror.com file:<绝对路径>/release-artifacts/dsh-context-compression-selector-runtime-0.2.2-rc.3.tgz
-pnpm add --registry=https://registry.npmmirror.com file:<绝对路径>/release-artifacts/dsh-context-compression-selector-0.2.2-rc.3.tgz
+pnpm add --registry=https://registry.npmmirror.com file:<绝对路径>/release-artifacts/dsh-context-compression-selector-runtime-0.2.2-rc.5.tgz
+pnpm add --registry=https://registry.npmmirror.com file:<绝对路径>/release-artifacts/dsh-context-compression-selector-0.2.2-rc.5.tgz
 ```
 
 #### 为什么必须写 `overrides`
 
-选择器把 runtime 依赖声明为**精确版本**（`"dsh-context-compression-selector-runtime": "0.2.2-rc.3"`）。包管理器每次 `add` 都会重新解析整棵依赖树，于是：
+选择器把 runtime 依赖声明为**精确版本**（`"dsh-context-compression-selector-runtime": "0.2.2-rc.5"`）。包管理器每次 `add` 都会重新解析整棵依赖树，于是：
 
-- 只装选择器 tarball → 按**原名**去 registry 找 `0.2.2-rc.3`，而本 fork 发布的不是这个名字 → `ERR_PNPM_NO_MATCHING_VERSION`；
+- 只装选择器 tarball → 按**原名**去 registry 找 `0.2.2-rc.5`，而本 fork 发布的不是这个名字 → `ERR_PNPM_NO_MATCHING_VERSION`；
 - **先装 runtime 再装选择器也无效** —— 第二步照样回 registry 解析那个名字，结果相同；
 - 一次传入两个 tarball 也不行 —— pnpm 优先查 registry，不会采用同一命令行里的另一个 tarball。
 
